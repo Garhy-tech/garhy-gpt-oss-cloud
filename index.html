@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#090b10" />
-  <title>GToneBOT · GARHY TECH</title>
+  <title>Hana · GARHY TECH</title>
   <style>
     :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
     *{box-sizing:border-box}body{margin:0;background:#090b10;color:#f5f7fb;min-height:100vh}
@@ -20,13 +20,13 @@
 <body>
 <main>
   <div class="brand">GARHY TECH · AI</div>
-  <h1 class="title">GToneBOT</h1>
-  <p class="sub"><b>GToneBOT</b> هو مساعد GARHY TECH الذكي، ويعمل حاليًا بنماذج <b>gpt-oss-20b</b> و <b>gpt-oss-120b</b> عبر Groq Cloud API. المصادقة تتم في الخادم ولا يتم إرسال أي مفتاح إلى المتصفح.</p>
+  <h1 class="title">Hana</h1>
+  <p class="sub"><b>Hana</b> هي مساعدة GARHY TECH الذكية بصيغة مؤنثة، وتعمل حاليًا بنماذج <b>gpt-oss-20b</b> و <b>gpt-oss-120b</b> عبر Groq Cloud API. المصادقة تتم في الخادم ولا يتم إرسال أي مفتاح إلى المتصفح.</p>
 
   <section class="panel">
     <div class="controls">
       <div class="field">
-        <label for="model">محرك GToneBOT</label>
+        <label for="model">محرك Hana</label>
         <select id="model">
           <option value="openai/gpt-oss-20b">gpt-oss-20b — أسرع وأوفر</option>
           <option value="openai/gpt-oss-120b">gpt-oss-120b — أقوى</option>
@@ -42,17 +42,17 @@
       </div>
     </div>
 
-    <textarea id="prompt" class="prompt" maxlength="8000" placeholder="اسأل GToneBOT..."></textarea>
+    <textarea id="prompt" class="prompt" maxlength="8000" placeholder="اسأل Hana..."></textarea>
     <div class="actions">
-      <button id="send" class="send">إرسال إلى GToneBOT</button>
-      <span id="state" class="meta">جاهز</span>
+      <button id="send" class="send">إرسال إلى Hana</button>
+      <span id="state" class="meta">جاهزة</span>
     </div>
 
-    <div id="answer" class="answer empty">ستظهر إجابة GToneBOT هنا.</div>
+    <div id="answer" class="answer empty">ستظهر إجابة Hana هنا.</div>
     <div id="stats" class="stats"></div>
   </section>
 
-  <p class="notice">GToneBOT by GARHY TECH · الطلبات تُرسل من الخادم مباشرة إلى Groq باستخدام GROQ_API_KEY المخزن كـ Environment Variable. لا يصل المفتاح إلى المتصفح.</p>
+  <p class="notice">Hana by GARHY TECH · الطلبات تُرسل من الخادم مباشرة إلى Groq باستخدام GROQ_API_KEY المخزن كـ Environment Variable. لا يصل المفتاح إلى المتصفح.</p>
 </main>
 <script>
   const $ = (id) => document.getElementById(id);
@@ -67,7 +67,7 @@
     if (!prompt) return;
 
     sendEl.disabled = true;
-    stateEl.textContent = 'GToneBOT يفكر...';
+    stateEl.textContent = 'Hana تفكر...';
     answerEl.classList.add('empty');
     answerEl.textContent = '...';
     statsEl.textContent = '';
@@ -89,7 +89,7 @@
       answerEl.classList.remove('empty');
       answerEl.textContent = data.reply;
       const u = data.usage || {};
-      statsEl.textContent = `${data.name || 'GToneBOT'} · ${data.provider || 'groq'} · ${data.model || ''} · input ${u.prompt_tokens ?? u.input_tokens ?? '-'} · output ${u.completion_tokens ?? u.output_tokens ?? '-'}`;
+      statsEl.textContent = `${data.name || 'Hana'} · ${data.provider || 'groq'} · ${data.model || ''} · input ${u.prompt_tokens ?? u.input_tokens ?? '-'} · output ${u.completion_tokens ?? u.output_tokens ?? '-'}`;
       stateEl.textContent = 'تم';
     } catch (error) {
       answerEl.classList.add('empty');
