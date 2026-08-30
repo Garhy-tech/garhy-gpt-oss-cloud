@@ -82,8 +82,8 @@ const copy = {
     health_checking: 'يتم فحص الخدمة',
     skip_to_workspace: 'الانتقال إلى المحادثة',
     user_label: 'أنت',
-    error_response: 'تعذر إكمال الطلب الآن. حاولي مرة أخرى بعد لحظات.',
-    error_empty: 'اكتبي رسالة أولًا.',
+    error_response: 'تعذر إكمال الطلب الآن. يمكنك المحاولة مجددًا بعد لحظات.',
+    error_empty: 'أضف رسالة أولًا.',
     typing_label: 'Hana تكتب',
     request_cancelled: 'توقفت المحاولة. يمكنك الإرسال من جديد.',
     description: 'Hana، مساعدة GARHY TECH الذكية لتفكير أوضح ومحادثات أكثر سلاسة.'
@@ -544,6 +544,13 @@ elements.startChat.addEventListener('click', () => {
     block: 'start'
   });
   window.setTimeout(() => elements.prompt.focus(), 420);
+});
+document.querySelectorAll('[data-prompt-key]').forEach((button) => {
+  button.addEventListener('click', () => {
+    elements.prompt.value = text(button.dataset.promptKey);
+    updateCharacterCount();
+    elements.prompt.focus();
+  });
 });
 elements.languageToggle.addEventListener('click', () => {
   applyLocale(state.locale === 'ar' ? 'en' : 'ar');

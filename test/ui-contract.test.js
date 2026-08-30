@@ -38,3 +38,9 @@ test('the advanced controls preserve the backend model and reasoning contract', 
   assert.match(index, /value="high"/);
   assert.match(app, /credentials: 'same-origin'/);
 });
+
+test('conversation starters populate the accessible composer', () => {
+  assert.match(index, /data-prompt-key="suggestion_one"/);
+  assert.match(app, /document\.querySelectorAll\('\[data-prompt-key\]'\)\.forEach/);
+  assert.match(app, /elements\.prompt\.value = text\(button\.dataset\.promptKey\)/);
+});
