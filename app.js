@@ -18,153 +18,162 @@ function saveValue(key, value) {
 
 const copy = {
   ar: {
-    brand_category: 'ذكاء رقمي',
+    brand_category: 'ذكاء رقمي متقن',
     primary_navigation: 'التنقل الرئيسي',
     nav_workspace: 'المحادثة',
     nav_experience: 'تجربة Hana',
     theme_toggle: 'تبديل المظهر',
-    hero_title: 'ذكاء GARHY TECH، في محادثة واحدة.',
-    hero_lead: 'Hana تمنح أفكارك مساحة أوضح؛ بهدوء، سرعة، ولمسة إنسانية دقيقة.',
-    start_chat: 'ابدأ محادثة',
-    secure_note: 'اتصال آمن من المتصفح إلى الخدمة',
+    music_play: 'تشغيل الموسيقى',
+    music_pause: 'إيقاف الموسيقى',
+    music_error: 'تعذر تشغيل الموسيقى',
+    hero_title: 'ذكاء GARHY TECH في محادثة واحدة',
+    hero_lead: 'Hana تمنح أفكارك وضوحا أكبر وتحولها إلى خطوات عملية بهدوء ودقة',
+    start_chat: 'ابدأ مع Hana',
+    secure_note: 'اتصال آمن يحمي خصوصية المحادثة',
     hero_identity: 'مساعدة GARHY TECH الذكية',
-    media_kicker: 'داخل عالم GARHY TECH',
-    media_title: 'تفاصيل صنعت هوية Hana',
-    media_note: 'اسحب لاستكشاف المشاهد',
+    media_kicker: 'عالم GARHY TECH',
+    media_title: 'مشاهد صنعت هوية Hana',
+    media_note: 'اسحب لاستكشاف التجربة',
     media_aria: 'مشاهد GARHY TECH البصرية',
     workspace_kicker: 'مساحة Hana',
-    workspace_title: 'محادثة تبدو لك وحدك',
-    status_ready: 'جاهزة',
+    workspace_title: 'محادثة واضحة تبدأ منك',
+    status_ready: 'Hana جاهزة',
     status_thinking: 'Hana تفكر',
-    status_complete: 'جاهزة',
+    status_complete: 'Hana جاهزة',
     status_unavailable: 'الخدمة غير متاحة الآن',
     new_chat: 'محادثة جديدة',
     conversation_aria: 'محادثة Hana',
-    assistant_label: 'مساعدة GARHY TECH',
-    welcome: 'مرحبًا، أنا Hana، مساعدة GARHY TECH الذكية. كيف يمكنني مساعدتك اليوم؟',
+    assistant_label: 'مساعدة GARHY TECH الذكية',
+    welcome: 'مرحبا أنا Hana المساعدة الذكية من GARHY TECH كيف يمكنني مساعدتك اليوم',
     suggestions_aria: 'اقتراحات للبدء',
-    suggestion_one: 'ساعديني في ترتيب فكرة مشروع',
+    suggestion_one: 'ساعديني في تطوير فكرة مشروع',
     suggestion_two: 'اكتبي لي رسالة احترافية',
-    suggestion_three: 'لخّصي هذه الملاحظات',
+    suggestion_three: 'لخصي هذه الملاحظات',
     composer_label: 'رسالتك إلى Hana',
-    composer_placeholder: 'ما الذي تعمل عليه اليوم؟',
-    shortcut_hint: 'Enter للإرسال · Shift + Enter لسطر جديد',
+    composer_placeholder: 'اكتب ما تريد إنجازه اليوم',
+    shortcut_hint: 'Enter للإرسال و Shift Enter لسطر جديد',
+    count_joiner: 'من',
     send: 'إرسال',
     sending: 'جارٍ الإرسال',
     advanced_settings: 'إعدادات Hana',
-    model_label: 'نمط Hana',
-    model_fast: 'سريع · gpt-oss-20b',
-    model_power: 'قوي · gpt-oss-120b',
+    model_label: 'أسلوب Hana',
+    model_fast: 'سريع',
+    model_power: 'قوي',
     reasoning_label: 'مستوى التفكير',
     reasoning_fast: 'سريع',
     reasoning_balanced: 'متوازن',
     reasoning_deep: 'عميق',
     hana_identity_aria: 'هوية Hana',
     aside_identity: 'من GARHY TECH',
-    aside_kicker: 'حاضرة بسلاسة',
-    aside_title: 'أفكارك، بصوت واضح.',
-    aside_body: 'من أول سؤال إلى أول خطوة، Hana تحافظ على المحادثة بسيطة، مرتبة، ومركزة.',
-    confidence_one: 'واجهة عربية أولًا',
-    confidence_two: 'تحكم هادئ في الإعدادات',
-    confidence_three: 'رسائل واضحة ومركزة',
-    experience_kicker: 'طريقة عمل أنيقة',
-    experience_title: 'كل ما تحتاجه، دون ضوضاء.',
-    experience_body: 'واجهة نظيفة تترك مساحة للتفكير، مع تفاصيل صغيرة تساعدك في كل خطوة.',
-    capability_one_title: 'ابدأ ببساطة',
-    capability_one_body: 'اكتب فكرتك كما هي. Hana تتعامل مع السياق خطوة بخطوة.',
-    capability_two_title: 'حافظ على الإيقاع',
-    capability_two_body: 'استمر في نفس المحادثة من دون أن تفقد اتجاهك أو نبرة فكرتك.',
-    capability_three_title: 'جزء من منظومة أكبر',
-    footer_note: 'مصممة لتبقى المحادثة هي الأهم.',
+    aside_kicker: 'وضوح في كل خطوة',
+    aside_title: 'أفكارك بصوت أكثر وضوحا',
+    aside_body: 'Hana ترتب أفكارك وتحافظ على سياق المحادثة حتى تصل إلى الخطوة التالية بثقة',
+    confidence_one: 'واجهة عربية متقنة',
+    confidence_two: 'تحكم واضح في الإعدادات',
+    confidence_three: 'محادثة مركزة وسلسة',
+    experience_kicker: 'تجربة مصممة بعناية',
+    experience_title: 'كل ما تحتاجه دون ضوضاء',
+    experience_body: 'مساحة هادئة تساعدك على التفكير والكتابة واتخاذ الخطوة التالية',
+    capability_one_title: 'ابدأ بوضوح',
+    capability_one_body: 'اكتب فكرتك كما هي وتساعدك Hana على تطويرها خطوة بخطوة',
+    capability_two_title: 'حافظ على السياق',
+    capability_two_body: 'واصل المحادثة بسلاسة مع فهم أدق لاتجاهك ونبرة فكرتك',
+    capability_three_title: 'جزء من GARHY TECH',
+    footer_note: 'محادثة ذكية مصممة حول احتياجك',
     health_check: 'فحص حالة الخدمة',
     health_online: 'الخدمة متصلة',
     health_offline: 'الخدمة تحتاج محاولة لاحقة',
     health_checking: 'يتم فحص الخدمة',
     skip_to_workspace: 'الانتقال إلى المحادثة',
     user_label: 'أنت',
-    error_response: 'تعذر إكمال الطلب الآن. يمكنك المحاولة مجددًا بعد لحظات.',
-    error_empty: 'أضف رسالة أولًا.',
+    error_response: 'تعذر إكمال الطلب الآن ويمكنك المحاولة بعد لحظات',
+    error_empty: 'أضف رسالة للبدء',
     typing_label: 'Hana تكتب',
-    request_cancelled: 'توقفت المحاولة. يمكنك الإرسال من جديد.',
-    description: 'Hana، مساعدة GARHY TECH الذكية لتفكير أوضح ومحادثات أكثر سلاسة.'
+    request_cancelled: 'توقفت المحاولة ويمكنك الإرسال من جديد',
+    description: 'Hana المساعدة الذكية من GARHY TECH لتفكير أوضح ومحادثات أكثر سلاسة'
   },
   en: {
-    brand_category: 'Digital intelligence',
+    brand_category: 'Refined digital intelligence',
     primary_navigation: 'Primary navigation',
     nav_workspace: 'Conversation',
     nav_experience: 'Hana experience',
     theme_toggle: 'Toggle color theme',
-    hero_title: 'GARHY TECH intelligence, in one conversation.',
-    hero_lead: 'Hana gives your ideas more room—calmly, quickly, and with a considered human touch.',
-    start_chat: 'Start a conversation',
-    secure_note: 'A secure connection from your browser to the service',
-    hero_identity: 'AI assistant by GARHY TECH',
+    music_play: 'Play music',
+    music_pause: 'Pause music',
+    music_error: 'Music is unavailable',
+    hero_title: 'GARHY TECH intelligence in one conversation',
+    hero_lead: 'Hana brings clarity to your ideas and turns them into practical next steps',
+    start_chat: 'Start with Hana',
+    secure_note: 'A secure connection built for private conversations',
+    hero_identity: 'Intelligent assistant by GARHY TECH',
     media_kicker: 'Inside GARHY TECH',
-    media_title: 'The details behind Hana',
-    media_note: 'Drag to explore the scenes',
+    media_title: 'The visual world behind Hana',
+    media_note: 'Drag to explore the experience',
     media_aria: 'GARHY TECH visual stories',
     workspace_kicker: 'Hana workspace',
-    workspace_title: 'A conversation that feels like yours',
-    status_ready: 'Ready',
+    workspace_title: 'A focused conversation shaped around you',
+    status_ready: 'Hana is ready',
     status_thinking: 'Hana is thinking',
-    status_complete: 'Ready',
+    status_complete: 'Hana is ready',
     status_unavailable: 'Service unavailable',
     new_chat: 'New chat',
     conversation_aria: 'Hana conversation',
-    assistant_label: 'GARHY TECH assistant',
-    welcome: 'Hello, I am Hana, the intelligent assistant from GARHY TECH. How can I help today?',
+    assistant_label: 'Intelligent assistant by GARHY TECH',
+    welcome: 'Hello I am Hana the intelligent assistant from GARHY TECH How can I help today',
     suggestions_aria: 'Conversation starters',
-    suggestion_one: 'Help me shape a project idea',
+    suggestion_one: 'Help me develop a project idea',
     suggestion_two: 'Write a professional message',
     suggestion_three: 'Summarize these notes',
     composer_label: 'Your message to Hana',
-    composer_placeholder: 'What are you working on today?',
-    shortcut_hint: 'Enter to send · Shift + Enter for a new line',
+    composer_placeholder: 'Write what you want to accomplish today',
+    shortcut_hint: 'Enter to send and Shift Enter for a new line',
+    count_joiner: 'of',
     send: 'Send',
     sending: 'Sending',
     advanced_settings: 'Hana settings',
-    model_label: 'Hana mode',
-    model_fast: 'Fast · gpt-oss-20b',
-    model_power: 'Power · gpt-oss-120b',
+    model_label: 'Hana style',
+    model_fast: 'Fast',
+    model_power: 'Power',
     reasoning_label: 'Reasoning',
     reasoning_fast: 'Fast',
     reasoning_balanced: 'Balanced',
     reasoning_deep: 'Deep',
     hana_identity_aria: 'Hana identity',
     aside_identity: 'by GARHY TECH',
-    aside_kicker: 'Present, quietly',
-    aside_title: 'Your ideas, in a clear voice.',
-    aside_body: 'From the first question to the next step, Hana keeps the conversation simple, ordered, and focused.',
-    confidence_one: 'Arabic-first interface',
-    confidence_two: 'Calm control of settings',
-    confidence_three: 'Clear, focused messages',
-    experience_kicker: 'An elegant flow',
-    experience_title: 'Everything you need, without the noise.',
-    experience_body: 'A clean interface that leaves room to think, with small details that help at every step.',
-    capability_one_title: 'Start simply',
-    capability_one_body: 'Write your idea as it is. Hana follows the context, one step at a time.',
-    capability_two_title: 'Keep your rhythm',
-    capability_two_body: 'Continue the same conversation without losing its direction or tone.',
-    capability_three_title: 'Part of something larger',
-    footer_note: 'Designed to keep the conversation at the center.',
+    aside_kicker: 'Clarity at every step',
+    aside_title: 'Your ideas in a clearer voice',
+    aside_body: 'Hana keeps your ideas organized and your conversation focused on the next meaningful step',
+    confidence_one: 'Refined Arabic first interface',
+    confidence_two: 'Clear control of settings',
+    confidence_three: 'Focused natural conversations',
+    experience_kicker: 'Designed with purpose',
+    experience_title: 'Everything you need without the noise',
+    experience_body: 'A calm space for thinking writing and moving your ideas forward',
+    capability_one_title: 'Start with clarity',
+    capability_one_body: 'Write your idea as it is and Hana helps you develop it one step at a time',
+    capability_two_title: 'Keep the context',
+    capability_two_body: 'Continue naturally with a clearer understanding of your direction and tone',
+    capability_three_title: 'Part of GARHY TECH',
+    footer_note: 'An intelligent conversation designed around your needs',
     health_check: 'Check service status',
     health_online: 'Service connected',
     health_offline: 'Try the service again later',
     health_checking: 'Checking service',
     skip_to_workspace: 'Skip to conversation',
     user_label: 'You',
-    error_response: 'The request could not be completed right now. Please try again in a moment.',
-    error_empty: 'Write a message first.',
+    error_response: 'The request could not be completed right now Please try again in a moment',
+    error_empty: 'Add a message to begin',
     typing_label: 'Hana is writing',
-    request_cancelled: 'The request stopped. You can send it again.',
-    description: 'Hana, the intelligent assistant from GARHY TECH for clearer thinking and smoother conversations.'
+    request_cancelled: 'The request stopped and you can send it again',
+    description: 'Hana the intelligent assistant from GARHY TECH for clearer thinking and smoother conversations'
   }
 };
 
 const state = {
   locale: savedValue('hana-locale') === 'en' ? 'en' : 'ar',
   history: [],
-  sending: false
+  sending: false,
+  musicPlaying: false
 };
 
 const elements = {
@@ -182,6 +191,9 @@ const elements = {
   startChat: $('startChat'),
   languageToggle: $('languageToggle'),
   themeToggle: $('themeToggle'),
+  musicToggle: $('musicToggle'),
+  musicLabel: $('musicLabel'),
+  audio: $('hanaAudio'),
   mediaRail: $('mediaRail'),
   mediaTrack: $('mediaTrack'),
   model: $('model'),
@@ -226,6 +238,8 @@ function applyLocale(locale) {
   elements.languageToggle.textContent = locale === 'ar' ? 'EN' : 'ع';
   elements.languageToggle.setAttribute('aria-label', locale === 'ar' ? 'Switch language to English' : 'تبديل اللغة إلى العربية');
   setMetaDescription(text('description'));
+  updateCharacterCount();
+  updateMusicControl(state.musicPlaying);
 }
 
 function currentTheme() {
@@ -248,9 +262,42 @@ function setServiceStatus(key) {
 }
 
 function updateCharacterCount() {
-  elements.characterCount.textContent = String(elements.prompt.value.length) + ' / 8000';
+  elements.characterCount.textContent = String(elements.prompt.value.length) + ' ' + text('count_joiner') + ' 8000';
   elements.prompt.style.height = 'auto';
   elements.prompt.style.height = Math.min(elements.prompt.scrollHeight, 190) + 'px';
+}
+
+function updateMusicControl(isPlaying) {
+  state.musicPlaying = isPlaying;
+  const key = isPlaying ? 'music_pause' : 'music_play';
+  elements.musicLabel.textContent = text(key);
+  elements.musicToggle.setAttribute('aria-label', text(key));
+  elements.musicToggle.setAttribute('aria-pressed', String(isPlaying));
+  elements.musicToggle.classList.toggle('is-playing', isPlaying);
+}
+
+async function toggleMusic() {
+  if (!elements.audio.paused) {
+    elements.audio.pause();
+    updateMusicControl(false);
+    return;
+  }
+
+  elements.audio.volume = 0.48;
+  try {
+    await elements.audio.play();
+    updateMusicControl(true);
+  } catch (error) {
+    updateMusicControl(false);
+    elements.musicLabel.textContent = text('music_error');
+    window.setTimeout(() => updateMusicControl(false), 1800);
+  }
+}
+
+function triggerHaptic(button) {
+  if (button.disabled || typeof navigator.vibrate !== 'function') return;
+  const duration = button.classList.contains('button--primary') || button === elements.musicToggle ? 14 : 8;
+  navigator.vibrate(duration);
 }
 
 function scrollConversationToEnd() {
@@ -304,6 +351,7 @@ function appendMessage(role, content, options = {}) {
       meta.append(label);
     }
     const paragraph = document.createElement('p');
+    paragraph.dir = 'auto';
     paragraph.textContent = content;
     bubble.append(meta, paragraph);
   }
@@ -557,7 +605,14 @@ elements.languageToggle.addEventListener('click', () => {
   clearConversation();
 });
 elements.themeToggle.addEventListener('click', () => setTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
+elements.musicToggle.addEventListener('click', toggleMusic);
+elements.audio.addEventListener('play', () => updateMusicControl(true));
+elements.audio.addEventListener('pause', () => updateMusicControl(false));
 elements.healthCheck.addEventListener('click', checkHealth);
+document.addEventListener('click', (event) => {
+  const button = event.target instanceof Element ? event.target.closest('button') : null;
+  if (button) triggerHaptic(button);
+});
 
 applyLocale(state.locale);
 updateThemeColor();
