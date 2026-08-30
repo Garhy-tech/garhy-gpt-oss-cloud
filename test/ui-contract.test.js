@@ -4,10 +4,12 @@ import test from 'node:test';
 
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const copySource = app.slice(app.indexOf('const copy'), app.indexOf('const state'));
 
 test('the public interface preserves Hana as the product identity', () => {
-  assert.match(index, /<title>Hana · GARHY TECH<\/title>/);
-  assert.match(index, /مرحبًا، أنا Hana، مساعدة GARHY TECH الذكية/);
+  assert.match(index, /<title>Hana GARHY TECH<\/title>/);
+  assert.match(index, /مرحبا أنا Hana المساعدة الذكية من GARHY TECH/);
+  assert.doesNotMatch(index + app, /هانا|جارهي\s*تك/i);
   assert.doesNotMatch(index, /GROQ_API_KEY|Groq Cloud API|Environment Variable/i);
 });
 
@@ -17,6 +19,13 @@ test('the interface exposes branded metadata and PWA assets', () => {
   assert.equal(existsSync(new URL('../assets/og-hana.jpg', import.meta.url)), true);
   assert.equal(existsSync(new URL('../assets/icon-512.webp', import.meta.url)), true);
   assert.equal(existsSync(new URL('../manifest.webmanifest', import.meta.url)), true);
+  assert.equal(existsSync(new URL('../assets/brand/gt-lion-logo.webp', import.meta.url)), true);
+});
+
+test('the visible copy dictionary is punctuation free', () => {
+  const values = [...copySource.matchAll(/^\s+\w+: '([^']*)',?$/gm)].map((match) => match[1]);
+  assert.ok(values.length > 100);
+  for (const value of values) assert.doesNotMatch(value, /[،؛؟!.,·—:]/);
 });
 
 test('the media rail includes all ten optimized editorial assets', () => {
@@ -43,4 +52,13 @@ test('conversation starters populate the accessible composer', () => {
   assert.match(index, /data-prompt-key="suggestion_one"/);
   assert.match(app, /document\.querySelectorAll\('\[data-prompt-key\]'\)\.forEach/);
   assert.match(app, /elements\.prompt\.value = text\(button\.dataset\.promptKey\)/);
+});
+
+test('music and haptic controls are built into the interface', () => {
+  assert.match(index, /id="musicToggle"/);
+  assert.match(index, /id="hanaAudio" preload="none" loop/);
+  assert.match(index, /assets\/brand\/gt-lion-logo\.webp/);
+  assert.match(app, /elements\.audio\.play\(\)/);
+  assert.match(app, /navigator\.vibrate\(duration\)/);
+  assert.equal(existsSync(new URL('../assets/audio/hana-theme.mp3', import.meta.url)), true);
 });
