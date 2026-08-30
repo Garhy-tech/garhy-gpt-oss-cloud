@@ -6,6 +6,10 @@ Production-ready lightweight Vercel app for testing `openai/gpt-oss-20b` and `op
 
 Set `GROQ_API_KEY` in Vercel for Production, then redeploy.
 
+## Deployment
+
+Source repository is connected to the existing Vercel project. Pushes to `main` trigger production deployments.
+
 ## Security
 
 - API key stays server-side.
