@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#090b10" />
-  <title>GARHY GPT-OSS Cloud</title>
+  <title>GToneBOT · GARHY TECH</title>
   <style>
     :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
     *{box-sizing:border-box}body{margin:0;background:#090b10;color:#f5f7fb;min-height:100vh}
     main{width:min(920px,calc(100% - 28px));margin:0 auto;padding:42px 0 60px}
-    .brand{font-weight:800;letter-spacing:.12em;font-size:13px;color:#aeb8cf}.title{font-size:clamp(30px,5vw,54px);line-height:1.05;margin:10px 0 12px}.sub{color:#9fa9bd;max-width:720px;line-height:1.8;margin-bottom:26px}
+    .brand{font-weight:800;letter-spacing:.12em;font-size:13px;color:#aeb8cf}.title{font-size:clamp(34px,6vw,60px);line-height:1.05;margin:10px 0 12px}.sub{color:#9fa9bd;max-width:720px;line-height:1.8;margin-bottom:26px}
     .panel{background:#11151d;border:1px solid #222a38;border-radius:22px;padding:18px;box-shadow:0 22px 70px rgba(0,0,0,.3)}
     .controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.field label{display:block;font-size:12px;color:#8f9ab0;margin:0 2px 7px}.field select,.prompt{width:100%;background:#0b0f16;color:#fff;border:1px solid #293244;border-radius:14px;padding:13px 14px;outline:none}.prompt{min-height:145px;resize:vertical;line-height:1.7;font:inherit}.field select:focus,.prompt:focus{border-color:#596780}
     .actions{display:flex;gap:10px;align-items:center;margin-top:12px}.send{border:0;border-radius:14px;padding:13px 18px;font-weight:750;cursor:pointer;background:#f3f6fb;color:#0a0d12}.send:disabled{opacity:.55;cursor:wait}.meta{font-size:12px;color:#7f8aa0}
@@ -19,14 +19,14 @@
 </head>
 <body>
 <main>
-  <div class="brand">GARHY TECH · CLOUD AI</div>
-  <h1 class="title">gpt-oss على السحابة</h1>
-  <p class="sub">واجهة خفيفة لاختبار <b>gpt-oss-20b</b> و <b>gpt-oss-120b</b> عبر Groq Cloud API. المصادقة تتم في الخادم ولا يتم إرسال أي مفتاح إلى المتصفح.</p>
+  <div class="brand">GARHY TECH · AI</div>
+  <h1 class="title">GToneBOT</h1>
+  <p class="sub"><b>GToneBOT</b> هو مساعد GARHY TECH الذكي، ويعمل حاليًا بنماذج <b>gpt-oss-20b</b> و <b>gpt-oss-120b</b> عبر Groq Cloud API. المصادقة تتم في الخادم ولا يتم إرسال أي مفتاح إلى المتصفح.</p>
 
   <section class="panel">
     <div class="controls">
       <div class="field">
-        <label for="model">النموذج</label>
+        <label for="model">محرك GToneBOT</label>
         <select id="model">
           <option value="openai/gpt-oss-20b">gpt-oss-20b — أسرع وأوفر</option>
           <option value="openai/gpt-oss-120b">gpt-oss-120b — أقوى</option>
@@ -42,17 +42,17 @@
       </div>
     </div>
 
-    <textarea id="prompt" class="prompt" maxlength="8000" placeholder="اكتب رسالتك هنا..."></textarea>
+    <textarea id="prompt" class="prompt" maxlength="8000" placeholder="اسأل GToneBOT..."></textarea>
     <div class="actions">
-      <button id="send" class="send">إرسال</button>
+      <button id="send" class="send">إرسال إلى GToneBOT</button>
       <span id="state" class="meta">جاهز</span>
     </div>
 
-    <div id="answer" class="answer empty">ستظهر إجابة النموذج هنا.</div>
+    <div id="answer" class="answer empty">ستظهر إجابة GToneBOT هنا.</div>
     <div id="stats" class="stats"></div>
   </section>
 
-  <p class="notice">ملاحظة: الطلبات تُرسل من الخادم مباشرة إلى Groq باستخدام GROQ_API_KEY المخزن كـ Environment Variable. لا يصل المفتاح إلى المتصفح.</p>
+  <p class="notice">GToneBOT by GARHY TECH · الطلبات تُرسل من الخادم مباشرة إلى Groq باستخدام GROQ_API_KEY المخزن كـ Environment Variable. لا يصل المفتاح إلى المتصفح.</p>
 </main>
 <script>
   const $ = (id) => document.getElementById(id);
@@ -67,7 +67,7 @@
     if (!prompt) return;
 
     sendEl.disabled = true;
-    stateEl.textContent = 'جارٍ الاتصال بالنموذج...';
+    stateEl.textContent = 'GToneBOT يفكر...';
     answerEl.classList.add('empty');
     answerEl.textContent = '...';
     statsEl.textContent = '';
@@ -89,7 +89,7 @@
       answerEl.classList.remove('empty');
       answerEl.textContent = data.reply;
       const u = data.usage || {};
-      statsEl.textContent = `${data.provider || 'groq'} · ${data.model || ''} · input ${u.prompt_tokens ?? u.input_tokens ?? '-'} · output ${u.completion_tokens ?? u.output_tokens ?? '-'}`;
+      statsEl.textContent = `${data.name || 'GToneBOT'} · ${data.provider || 'groq'} · ${data.model || ''} · input ${u.prompt_tokens ?? u.input_tokens ?? '-'} · output ${u.completion_tokens ?? u.output_tokens ?? '-'}`;
       stateEl.textContent = 'تم';
     } catch (error) {
       answerEl.classList.add('empty');
