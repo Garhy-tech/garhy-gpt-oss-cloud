@@ -8,6 +8,6 @@
   },
   "scripts": {
     "test": "node --test",
-    "check": "node --check api/chat.js && node --check api/health.js && node --check lib/validation.js"
+    "check": "node --check api/chat.js && node --check api/health.js && node --check lib/validation.js && node --check app.js"
   }
 }

@@ -1,0 +1,21 @@
+{
+  "name": "Hana · GARHY TECH",
+  "short_name": "Hana",
+  "description": "مساعدة GARHY TECH الذكية لتفكير أوضح ومحادثات أكثر سلاسة.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7faff",
+  "theme_color": "#1267f3",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/assets/icon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}
