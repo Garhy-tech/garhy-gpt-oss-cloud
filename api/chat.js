@@ -1,4 +1,5 @@
 import { validateChatInput } from '../lib/validation.js';
+import { normalizeIdentityReply } from '../lib/identity.js';
 
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_REQUESTS = 15;
@@ -146,10 +147,12 @@ export default async function handler(req, res) {
       });
     }
 
-    const reply = payload?.choices?.[0]?.message?.content;
-    if (typeof reply !== 'string' || !reply.trim()) {
+    const providerReply = payload?.choices?.[0]?.message?.content;
+    if (typeof providerReply !== 'string' || !providerReply.trim()) {
       return res.status(502).json({ error: 'The model returned an empty response.' });
     }
+
+    const reply = normalizeIdentityReply(providerReply);
 
     return res.status(200).json({
       reply,
