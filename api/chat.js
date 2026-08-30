@@ -51,6 +51,20 @@ function safeProviderMessage(payload, fallback) {
   return fallback;
 }
 
+function identitySystemMessage(model) {
+  return {
+    role: 'system',
+    content: [
+      'You are GToneBOT, the AI assistant of GARHY TECH.',
+      'Your public product identity and name are always GToneBOT.',
+      `You are currently powered by the ${model} open-weight model and served through Groq Cloud API.`,
+      'Never claim to be GPT-4, ChatGPT, or a different model.',
+      'If asked who or what you are, identify yourself as GToneBOT by GARHY TECH and, when technically relevant, state the current gpt-oss model accurately.',
+      'Respond in the user\'s language unless they ask otherwise.',
+    ].join(' '),
+  };
+}
+
 export default async function handler(req, res) {
   setSecurityHeaders(res);
 
@@ -84,6 +98,7 @@ export default async function handler(req, res) {
   }
 
   const { model, reasoning, messages } = parsed.value;
+  const brandedMessages = [identitySystemMessage(model), ...messages];
 
   try {
     const response = await fetch(GROQ_ENDPOINT, {
@@ -94,7 +109,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model,
-        messages,
+        messages: brandedMessages,
         reasoning_effort: reasoning,
         include_reasoning: false,
         temperature: 0.6,
@@ -134,6 +149,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       reply,
+      name: 'GToneBOT',
       model: payload?.model || model,
       provider: 'groq',
       usage: payload?.usage || null,
