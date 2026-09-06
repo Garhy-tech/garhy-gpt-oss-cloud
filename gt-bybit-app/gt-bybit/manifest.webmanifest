@@ -1,0 +1,42 @@
+{
+  "id": "/gt-bybit/",
+  "name": "GT.BYBIT",
+  "short_name": "GT.BYBIT",
+  "description": "GT.BYBIT — Secure Bybit control by GARHY TECH",
+  "start_url": "/gt-bybit/",
+  "scope": "/gt-bybit/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "background_color": "#03122b",
+  "theme_color": "#071b3d",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["finance", "business", "utilities"],
+  "icons": [
+    {
+      "src": "/assets/gt-bybit/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/gt-bybit/icon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "التداول",
+      "short_name": "Trade",
+      "url": "/gt-bybit/?view=trade"
+    },
+    {
+      "name": "الأصول",
+      "short_name": "Assets",
+      "url": "/gt-bybit/?view=assets"
+    }
+  ]
+}
