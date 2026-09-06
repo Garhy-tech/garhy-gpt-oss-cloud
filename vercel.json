@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "alias": ["bybit.garhy.tech"],
+  "alias": ["garhy.ai"],
   "functions": {
     "api/bybit.js": {
       "regions": ["fra1"],
