@@ -9,17 +9,6 @@
   "rewrites": [
     {
       "source": "/",
-      "has": [{ "type": "header", "key": "host", "value": "garhy.tech" }],
-      "destination": "/garhy-tech-corporate.html"
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "header", "key": "host", "value": "www.garhy.tech" }],
-      "destination": "/garhy-tech-corporate.html"
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "header", "key": "host", "value": "garhy-gpt-oss-cloud-git-garhy-tech-corporate-preview-garhy.vercel.app" }],
       "destination": "/garhy-tech-corporate.html"
     }
   ],
