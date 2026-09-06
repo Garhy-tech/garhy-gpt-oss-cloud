@@ -7,7 +7,8 @@ const SHELL = [
   '/gt-bybit/manifest.webmanifest',
   '/assets/gt-bybit/icon-180.png',
   '/assets/gt-bybit/icon-192.png',
-  '/assets/gt-bybit/icon-512.webp'
+  '/assets/gt-bybit/icon-512.webp',
+  '/assets/gt-bybit/gt-profile.jpg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -31,11 +32,11 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
   if (url.origin !== self.location.origin) return;
 
-  // Backward-compatible alias for the approved GT.BYBIT identity asset.
+  // Hero/profile identity uses the exact approved GARHY TECH artwork.
   if (url.pathname === '/assets/gt-bybit/icon-512.png') {
     event.respondWith(
-      caches.match('/assets/gt-bybit/icon-512.webp')
-        .then((cached) => cached || fetch('/assets/gt-bybit/icon-512.webp'))
+      caches.match('/assets/gt-bybit/gt-profile.jpg')
+        .then((cached) => cached || fetch('/assets/gt-bybit/gt-profile.jpg'))
     );
     return;
   }
