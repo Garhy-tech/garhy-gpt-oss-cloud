@@ -6,6 +6,24 @@
       "maxDuration": 10
     }
   },
+  "redirects": [
+    {
+      "source": "/bybit.html",
+      "destination": "/gt-bybit/",
+      "permanent": false
+    },
+    {
+      "source": "/bybit",
+      "destination": "/gt-bybit/",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/assets/gt-bybit/icon-512.png",
+      "destination": "/assets/gt-bybit/icon-512.webp"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
