@@ -21,7 +21,7 @@
   "rewrites": [
     {
       "source": "/assets/gt-bybit/icon-512.png",
-      "destination": "/assets/gt-bybit/icon-512.webp"
+      "destination": "/assets/gt-bybit/gt-profile.jpg"
     }
   ],
   "headers": [
