@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#07090d" />
+  <title>GARHY AI · Bybit Control</title>
+  <link rel="icon" href="/assets/brand/gt-lion-logo.webp" type="image/webp" />
+  <link rel="stylesheet" href="/bybit-dashboard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar__inner">
+      <div class="brand">
+        <span class="brand__mark"><img src="/assets/brand/gt-lion-logo.webp" alt="" /></span>
+        <span><strong>GARHY AI · BYBIT</strong><small>Production Control Console</small></span>
+      </div>
+      <div id="serviceStatus" class="status" data-state="idle"><span class="status__dot"></span><span>غير متصل</span></div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <h1>لوحة تحكم Bybit</h1>
+      <p>تحكم Server-side عبر Bybit V5. لا يتم تخزين Control Token في Local Storage أو داخل ملفات المشروع، ولا تُنفذ أي عملية مالية تلقائيًا.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card" id="authCard">
+        <div class="card__head"><h2>فتح جلسة التحكم</h2><small>BYBIT_CONTROL_TOKEN</small></div>
+        <div class="card__body">
+          <div class="login">
+            <label class="field"><span>Control Token</span><input id="controlToken" type="password" autocomplete="off" spellcheck="false" placeholder="أدخل BYBIT_CONTROL_TOKEN" /></label>
+            <button id="connectBtn" class="btn btn--primary" type="button">اتصال آمن</button>
+          </div>
+          <p class="notice">يبقى التوكن داخل ذاكرة الصفحة فقط ويُمسح عند تحديث الصفحة أو إغلاقها.</p>
+        </div>
+      </article>
+
+      <article class="card hidden" id="dashboardCard">
+        <div class="card__head"><h2>الحساب</h2><div class="toolbar"><button id="refreshBtn" class="btn btn--ghost" type="button">تحديث</button><button id="disconnectBtn" class="btn btn--ghost" type="button">إغلاق الجلسة</button></div></div>
+        <div class="card__body">
+          <div class="metrics">
+            <div class="metric"><span>Total Equity</span><strong id="mEquity">—</strong></div>
+            <div class="metric"><span>Wallet Balance</span><strong id="mWallet">—</strong></div>
+            <div class="metric"><span>Open Positions</span><strong id="mPositions">—</strong></div>
+            <div class="metric"><span>Open Orders</span><strong id="mOrders">—</strong></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card--half hidden protected">
+        <div class="card__head"><h2>المحفظة</h2><small>Unified Trading</small></div>
+        <div class="card__body"><div id="walletTable" class="table-wrap"><div class="empty">—</div></div></div>
+      </article>
+
+      <article class="card card--half hidden protected">
+        <div class="card__head"><h2>المراكز المفتوحة</h2><small>Linear / USDT</small></div>
+        <div class="card__body"><div id="positionsTable" class="table-wrap"><div class="empty">—</div></div></div>
+      </article>
+
+      <article class="card hidden protected">
+        <div class="card__head"><h2>الأوامر المفتوحة</h2><div class="toolbar"><select id="ordersCategory" aria-label="نوع السوق"><option value="spot">Spot</option><option value="linear">Linear</option><option value="inverse">Inverse</option><option value="option">Options</option></select><button id="reloadOrdersBtn" class="btn btn--ghost" type="button">تحميل</button></div></div>
+        <div class="card__body"><div id="ordersTable" class="table-wrap"><div class="empty">—</div></div></div>
+      </article>
+
+      <article class="card hidden protected">
+        <div class="card__head"><h2>تنفيذ أوامر</h2><small>كل عملية تتطلب إجراءً يدويًا</small></div>
+        <div class="card__body">
+          <div class="forms">
+            <form id="orderForm" class="form-block">
+              <h3>إنشاء أمر</h3>
+              <div class="form-grid">
+                <label class="field"><span>Category</span><select name="category"><option value="spot">Spot</option><option value="linear">Linear</option><option value="inverse">Inverse</option><option value="option">Options</option></select></label>
+                <label class="field"><span>Side</span><select name="side"><option value="Buy">Buy</option><option value="Sell">Sell</option></select></label>
+                <label class="field"><span>Symbol</span><input name="symbol" required placeholder="BTCUSDT" /></label>
+                <label class="field"><span>Order Type</span><select name="orderType"><option value="Market">Market</option><option value="Limit">Limit</option></select></label>
+                <label class="field"><span>Qty</span><input name="qty" inputmode="decimal" required placeholder="0.001" /></label>
+                <label class="field"><span>Price (Limit)</span><input name="price" inputmode="decimal" placeholder="اختياري" /></label>
+                <label class="field"><span>Take Profit</span><input name="takeProfit" inputmode="decimal" placeholder="اختياري" /></label>
+                <label class="field"><span>Stop Loss</span><input name="stopLoss" inputmode="decimal" placeholder="اختياري" /></label>
+                <button class="btn btn--primary wide" type="submit">مراجعة وتنفيذ الأمر</button>
+              </div>
+            </form>
+
+            <form id="leverageForm" class="form-block">
+              <h3>Leverage</h3>
+              <div class="form-grid">
+                <label class="field"><span>Category</span><select name="category"><option value="linear">Linear</option><option value="inverse">Inverse</option></select></label>
+                <label class="field"><span>Symbol</span><input name="symbol" required placeholder="BTCUSDT" /></label>
+                <label class="field"><span>Buy Leverage</span><input name="buyLeverage" inputmode="decimal" required placeholder="5" /></label>
+                <label class="field"><span>Sell Leverage</span><input name="sellLeverage" inputmode="decimal" required placeholder="5" /></label>
+                <button class="btn wide" type="submit">تحديث Leverage</button>
+              </div>
+            </form>
+
+            <form id="stopForm" class="form-block">
+              <h3>TP / SL / Trailing Stop</h3>
+              <div class="form-grid">
+                <label class="field"><span>Category</span><select name="category"><option value="linear">Linear</option><option value="inverse">Inverse</option></select></label>
+                <label class="field"><span>Symbol</span><input name="symbol" required placeholder="BTCUSDT" /></label>
+                <label class="field"><span>Take Profit</span><input name="takeProfit" inputmode="decimal" placeholder="اختياري" /></label>
+                <label class="field"><span>Stop Loss</span><input name="stopLoss" inputmode="decimal" placeholder="اختياري" /></label>
+                <label class="field"><span>Trailing Stop</span><input name="trailingStop" inputmode="decimal" placeholder="اختياري" /></label>
+                <label class="field"><span>Position Index</span><select name="positionIdx"><option value="0">0 · One-way</option><option value="1">1 · Hedge Buy</option><option value="2">2 · Hedge Sell</option></select></label>
+                <button class="btn wide" type="submit">تحديث الحماية</button>
+              </div>
+            </form>
+
+            <form id="transferForm" class="form-block">
+              <h3>تحويل داخلي</h3>
+              <div class="form-grid">
+                <label class="field"><span>Coin</span><input name="coin" required placeholder="USDT" /></label>
+                <label class="field"><span>Amount</span><input name="amount" inputmode="decimal" required placeholder="10" /></label>
+                <label class="field"><span>From</span><select name="fromAccountType"><option value="UNIFIED">UNIFIED</option><option value="FUND">FUND</option></select></label>
+                <label class="field"><span>To</span><select name="toAccountType"><option value="FUND">FUND</option><option value="UNIFIED">UNIFIED</option></select></label>
+                <button class="btn wide" type="submit">تنفيذ التحويل</button>
+              </div>
+            </form>
+
+            <form id="convertForm" class="form-block">
+              <h3>Convert</h3>
+              <div class="form-grid">
+                <label class="field"><span>From Coin</span><input name="fromCoin" required placeholder="USDT" /></label>
+                <label class="field"><span>To Coin</span><input name="toCoin" required placeholder="USDC" /></label>
+                <label class="field"><span>Amount</span><input name="requestAmount" inputmode="decimal" required placeholder="10" /></label>
+                <button class="btn wide" type="submit">احصل على Quote</button>
+              </div>
+              <div id="convertQuote" class="notice"></div>
+              <button id="confirmConvertBtn" class="btn btn--primary hidden" type="button">تأكيد Convert</button>
+            </form>
+
+            <form id="cancelAllForm" class="form-block danger-zone">
+              <h3>Danger Zone · Cancel All</h3>
+              <p class="notice">يلغي الأوامر المفتوحة ضمن السوق المحدد. يتطلب كتابة CANCEL_ALL يدويًا.</p>
+              <div class="form-grid">
+                <label class="field"><span>Category</span><select name="category"><option value="spot">Spot</option><option value="linear">Linear</option><option value="inverse">Inverse</option><option value="option">Options</option></select></label>
+                <label class="field"><span>Symbol (اختياري)</span><input name="symbol" placeholder="BTCUSDT" /></label>
+                <label class="field wide"><span>Confirmation</span><input name="confirm" required autocomplete="off" placeholder="CANCEL_ALL" /></label>
+                <button class="btn btn--danger wide" type="submit">إلغاء كل الأوامر المحددة</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/bybit-dashboard.js" defer></script>
+</body>
+</html>
