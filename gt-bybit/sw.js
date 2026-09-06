@@ -1,12 +1,13 @@
-const CACHE = 'gt-bybit-shell-v1';
+const CACHE = 'gt-bybit-shell-v2';
 const SHELL = [
   '/gt-bybit/',
   '/gt-bybit/index.html',
   '/gt-bybit/app.css',
   '/gt-bybit/app.js',
   '/gt-bybit/manifest.webmanifest',
+  '/assets/gt-bybit/icon-180.png',
   '/assets/gt-bybit/icon-192.png',
-  '/assets/gt-bybit/icon-512.png'
+  '/assets/gt-bybit/icon-512.webp'
 ];
 
 self.addEventListener('install', (event) => {
@@ -28,8 +29,16 @@ self.addEventListener('fetch', (event) => {
 
   // Financial/account API traffic is always network-only and never cached.
   if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
-
   if (url.origin !== self.location.origin) return;
+
+  // Backward-compatible alias for the original generated app shell.
+  if (url.pathname === '/assets/gt-bybit/icon-512.png') {
+    event.respondWith(
+      caches.match('/assets/gt-bybit/icon-512.webp')
+        .then((cached) => cached || fetch('/assets/gt-bybit/icon-512.webp'))
+    );
+    return;
+  }
 
   if (request.mode === 'navigate') {
     event.respondWith(
