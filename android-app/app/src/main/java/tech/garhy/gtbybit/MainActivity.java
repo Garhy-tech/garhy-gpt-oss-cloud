@@ -9,15 +9,21 @@ import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.SafeBrowsingResponse;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
-    private static final String APP_URL = "https://garhy-gpt-oss-cloud.vercel.app/gt-bybit/?native=android";
-    private static final String APP_HOST = "garhy-gpt-oss-cloud.vercel.app";
+    private static final String PRIMARY_URL = "https://bybit.garhy.tech/?native=android";
+    private static final String PRIMARY_HOST = "bybit.garhy.tech";
+    private static final String FALLBACK_URL = "https://garhy-gpt-oss-cloud.vercel.app/gt-bybit/?native=android";
+    private static final String FALLBACK_HOST = "garhy-gpt-oss-cloud.vercel.app";
+
     private WebView webView;
+    private boolean fallbackUsed = false;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -42,7 +48,7 @@ public class MainActivity extends Activity {
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " GTBYBIT-Android/1.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " GTBYBIT-Android/1.0.1");
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, false);
@@ -52,11 +58,31 @@ public class MainActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                if ("https".equalsIgnoreCase(uri.getScheme()) && APP_HOST.equalsIgnoreCase(uri.getHost())) {
+                String host = uri.getHost();
+                if ("https".equalsIgnoreCase(uri.getScheme()) &&
+                        (PRIMARY_HOST.equalsIgnoreCase(host) || FALLBACK_HOST.equalsIgnoreCase(host))) {
                     return false;
                 }
                 startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 return true;
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame()) {
+                    openFallback(view);
+                    return;
+                }
+                super.onReceivedError(view, request, error);
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                if (request.isForMainFrame() && errorResponse.getStatusCode() >= 400) {
+                    openFallback(view);
+                    return;
+                }
+                super.onReceivedHttpError(view, request, errorResponse);
             }
 
             @Override
@@ -66,10 +92,16 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            webView.loadUrl(APP_URL);
+            webView.loadUrl(PRIMARY_URL);
         } else {
             webView.restoreState(savedInstanceState);
         }
+    }
+
+    private void openFallback(WebView view) {
+        if (fallbackUsed) return;
+        fallbackUsed = true;
+        view.loadUrl(FALLBACK_URL);
     }
 
     @Override

@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "alias": ["bybit.garhy.tech"],
   "functions": {
     "api/bybit.js": {
       "regions": ["fra1"],
@@ -19,6 +20,13 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        { "type": "header", "key": "host", "value": "bybit.garhy.tech" }
+      ],
+      "destination": "/gt-bybit/"
+    },
     {
       "source": "/assets/gt-bybit/icon-512.png",
       "destination": "/assets/gt-bybit/gt-profile.jpg"
