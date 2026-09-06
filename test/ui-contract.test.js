@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
@@ -28,12 +29,18 @@ test('the visible copy dictionary is punctuation free', () => {
   for (const value of values) assert.doesNotMatch(value, /[،؛؟!.,·—:]/);
 });
 
-test('the media rail includes all ten optimized editorial assets', () => {
-  for (const file of ['01-6713', '02-6754', '03-6743', '04-6750', '05-6756', '06-6761', '07-6762', '08-6763', '09-6733', '10-6732']) {
+test('the media rail includes nine distinct optimized editorial assets', () => {
+  for (const file of ['01-6713', '02-6754', '03-6743', '04-6750', '05-6756', '06-6761', '07-6762', '08-6763', '09-6733']) {
     assert.equal(index.includes('/assets/media/' + file + '-640.webp'), true);
     assert.equal(existsSync(new URL('../assets/media/' + file + '-640.webp', import.meta.url)), true);
     assert.equal(existsSync(new URL('../assets/media/' + file + '-960.webp', import.meta.url)), true);
   }
+  const rail = index.match(/<ul id="mediaTrack"[^>]*>([\s\S]*?)<\/ul>/)[1];
+  const sources = [...rail.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(sources.length, 9);
+  const hashes = sources.map((src) => createHash('sha256')
+    .update(readFileSync(new URL('..' + src, import.meta.url))).digest('hex'));
+  assert.equal(new Set(hashes).size, sources.length, 'Each source slide must show a distinct image');
   assert.equal(app.includes('cloneNode(true)'), true);
   assert.equal(app.includes('translate3d'), true);
   assert.equal(app.includes('prefers-reduced-motion'), true);
