@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/bybit.js": {
+      "regions": ["fra1"],
+      "maxDuration": 10
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
