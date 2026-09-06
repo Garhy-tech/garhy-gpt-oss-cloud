@@ -1,4 +1,4 @@
-const CACHE = 'gt-bybit-shell-v2';
+const CACHE = 'gt-bybit-shell-v3';
 const SHELL = [
   '/gt-bybit/',
   '/gt-bybit/index.html',
@@ -31,7 +31,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
   if (url.origin !== self.location.origin) return;
 
-  // Backward-compatible alias for the original generated app shell.
+  // Backward-compatible alias for the approved GT.BYBIT identity asset.
   if (url.pathname === '/assets/gt-bybit/icon-512.png') {
     event.respondWith(
       caches.match('/assets/gt-bybit/icon-512.webp')
