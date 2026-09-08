@@ -15,7 +15,7 @@
   <link rel="manifest" href="/gt-bybit/manifest.webmanifest" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/gt-bybit/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/gt-bybit/icon-180.png" />
-  <link rel="stylesheet" href="/gt-bybit/app.css?v=20260906-1" />
+  <link rel="stylesheet" href="/gt-bybit/app.css?v=20260908-2" />
 </head>
 <body>
   <div id="offlineBanner" class="offline-banner hidden">أنت غير متصل بالإنترنت — أوامر الحساب متوقفة.</div>
@@ -44,6 +44,10 @@
           <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M7 7V5h10v2m-2 6h5"/></svg>
           <span>الأصول</span>
         </button>
+        <a class="nav__button" href="/gt-bybit/p2p.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M7 10h5m-5 4h8"/></svg>
+          <span>P2P Control</span>
+        </a>
         <button class="nav__button" type="button" data-view="settings">
           <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.97 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3v-4h.08A1.7 1.7 0 0 0 4.6 8.94a1.7 1.7 0 0 0-.34-1.88L4.2 7l2.83-2.83.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 10 3.01V3h4v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06L19.8 7l-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 20.96 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg>
           <span>الإعدادات</span>
@@ -100,7 +104,7 @@
             </div>
             <p class="security-note">
               <svg viewBox="0 0 24 24"><path d="M12 21s8-3.5 8-10V5l-8-3-8 3v6c0 6.5 8 10 8 10Z"/></svg>
-              <span>التوكن يبقى في RAM فقط، يُمسح عند Refresh/إغلاق التطبيق، والجلسة تُقفل تلقائيًا بعد 15 دقيقة من عدم النشاط.</span>
+              <span>التوكن يبقى في RAM فقط، ولا توجد مهلة خمول تلقائية. تنتهي الجلسة عند تسجيل الخروج أو إغلاق/تحديث الصفحة.</span>
             </p>
           </div>
         </section>
@@ -113,7 +117,7 @@
                   <span class="hero__eyebrow">LIVE ACCOUNT</span>
                   <h1>مركز التحكم</h1>
                   <p>ملخص لحظي للحساب الموحد، الرصيد، المراكز والأوامر المفتوحة.</p>
-                  <div class="session-badge"><span>الجلسة:</span><strong id="sessionClock">15:00</strong><span>·</span><span id="regionLabel">fra1</span></div>
+                  <div class="session-badge"><span>الجلسة:</span><strong id="sessionClock">مفتوحة</strong><span>·</span><span id="regionLabel">fra1</span></div>
                 </div>
                 <div class="hero__logo"><img src="/assets/gt-bybit/icon-512.png" alt="" /></div>
               </div>
@@ -182,10 +186,11 @@
           <section class="view" data-view-panel="settings">
             <div class="section-head"><div><h2>الإعدادات والأمان</h2><p>حالة التطبيق والجلسة وإعدادات التثبيت.</p></div></div>
             <div class="settings-grid">
+              <article class="setting"><h3>P2P Operations</h3><p>مركز منفصل لمراقبة Pending Orders والإعلانات والمحادثات كل 30 ثانية مع إشعارات، بدون تنفيذ مالي تلقائي.</p><a href="/gt-bybit/p2p.html" class="btn btn--primary" style="display:inline-flex;align-items:center;text-decoration:none">فتح P2P Control</a></article>
               <article class="setting"><h3>تطبيق GT.BYBIT</h3><p>يمكن تثبيت هذه الواجهة كتطبيق مستقل على Android/Desktop من المتصفح.</p><button id="installSettingsBtn" class="btn btn--primary" type="button">تثبيت GT.BYBIT</button></article>
               <article class="setting"><h3>قفل الجلسة</h3><p>يمسح Control Token من ذاكرة الصفحة فورًا ويمنع أي طلبات محمية حتى تسجيل الدخول من جديد.</p><button id="lockSettingsBtn" class="btn btn--danger" type="button">قفل الآن</button></article>
               <article class="setting"><h3>حالة النظام</h3><div class="app-meta"><div class="meta-row"><span>App</span><strong>GT.BYBIT</strong></div><div class="meta-row"><span>API</span><strong>Bybit V5</strong></div><div class="meta-row"><span>Account</span><strong>UNIFIED</strong></div><div class="meta-row"><span>Region</span><strong id="settingsRegion">—</strong></div><div class="meta-row"><span>PWA</span><strong id="pwaState">Browser</strong></div></div></article>
-              <article class="setting"><h3>سياسة الجلسة</h3><p>Control Token لا يذهب إلى LocalStorage أو IndexedDB أو Service Worker. أي API مالي يستخدم network-only.</p><div class="app-meta"><div class="meta-row"><span>Storage</span><strong>Memory only</strong></div><div class="meta-row"><span>Idle lock</span><strong>15 minutes</strong></div><div class="meta-row"><span>API cache</span><strong>Disabled</strong></div></div></article>
+              <article class="setting"><h3>سياسة الجلسة</h3><p>Control Token لا يذهب إلى LocalStorage أو IndexedDB أو Service Worker. أي API مالي يستخدم network-only.</p><div class="app-meta"><div class="meta-row"><span>Storage</span><strong>Memory only</strong></div><div class="meta-row"><span>Idle lock</span><strong>Disabled</strong></div><div class="meta-row"><span>API cache</span><strong>Disabled</strong></div></div></article>
             </div>
           </section>
         </div>
@@ -202,6 +207,6 @@
   </nav>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/gt-bybit/app.js?v=20260906-1" defer></script>
+  <script src="/gt-bybit/app.js?v=20260908-2" defer></script>
 </body>
 </html>
