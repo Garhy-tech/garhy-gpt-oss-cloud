@@ -12,14 +12,24 @@
   "deploymentState": "READY",
   "productionHttp": 200,
   "canonical": "https://garhy.tech/",
-  "customDomainStatus": "PENDING_BINDING",
-  "wwwPolicy": "redirect-to-apex-after-domain-binding",
+  "customDomainStatus": "PENDING_DNS_PROPAGATION",
+  "dns": {
+    "provider": "WordPress.com / Automattic",
+    "apexA": "216.198.79.1",
+    "wwwCname": "1d8709974641c879.vercel-dns-017.com",
+    "updated": true,
+    "mailRecordsPreserved": true,
+    "bybitRecordPreserved": true
+  },
+  "wwwPolicy": "permanent-redirect-to-apex",
   "verification": {
     "previewReady": true,
     "productionReady": true,
     "securityHeadersObserved": true,
-    "customDomainVerified": false,
-    "dnsVerified": false,
-    "customDomainSslVerified": false
+    "customDomainBoundInVercelUi": true,
+    "dnsRecordsUpdated": true,
+    "dnsPropagationVerified": false,
+    "customDomainSslVerified": false,
+    "wwwRedirectConfigured": true
   }
 }
