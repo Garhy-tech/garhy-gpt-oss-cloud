@@ -1,11 +1,25 @@
 {
   "surface": "garhy.tech",
   "project": "garhy-tech-corporate",
+  "projectId": "prj_4vuA9Jy32xJCKknLNyxn0rfHmdNi",
   "release": "phase-4-v1",
   "date": "2026-09-08",
   "source": "release/garhy-tech-corporate-v1-20260908",
   "mode": "manual-vercel-deploy",
   "gitIntegration": "deferred-on-hobby-private-org",
+  "deploymentId": "dpl_4MWvnfutUZHYwCuEtyXT1gR1ViFe",
+  "productionUrl": "https://garhy-tech-corporate.vercel.app/",
+  "deploymentState": "READY",
+  "productionHttp": 200,
   "canonical": "https://garhy.tech/",
-  "wwwPolicy": "redirect-to-apex-when-domain-binding-is-configured"
+  "customDomainStatus": "PENDING_BINDING",
+  "wwwPolicy": "redirect-to-apex-after-domain-binding",
+  "verification": {
+    "previewReady": true,
+    "productionReady": true,
+    "securityHeadersObserved": true,
+    "customDomainVerified": false,
+    "dnsVerified": false,
+    "customDomainSslVerified": false
+  }
 }
