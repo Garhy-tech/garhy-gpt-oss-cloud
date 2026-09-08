@@ -1,1 +1,11 @@
-{"site":"GARHY TECH Corporate","release":"v4-rtl-safe","commit":"ceb158d076a699f1d32cd6bae524e00460145c29","production":false}
+{
+  "surface": "garhy.tech",
+  "project": "garhy-tech-corporate",
+  "release": "phase-4-v1",
+  "date": "2026-09-08",
+  "source": "release/garhy-tech-corporate-v1-20260908",
+  "mode": "manual-vercel-deploy",
+  "gitIntegration": "deferred-on-hobby-private-org",
+  "canonical": "https://garhy.tech/",
+  "wwwPolicy": "redirect-to-apex-when-domain-binding-is-configured"
+}
