@@ -12,7 +12,7 @@
   "deploymentState": "READY",
   "productionHttp": 200,
   "canonical": "https://garhy.tech/",
-  "customDomainStatus": "PENDING_DNS_PROPAGATION",
+  "customDomainStatus": "VALID_CONFIGURATION_SSL_PENDING_EXTERNAL_VERIFICATION",
   "dns": {
     "provider": "WordPress.com / Automattic",
     "apexA": "216.198.79.1",
@@ -28,8 +28,10 @@
     "securityHeadersObserved": true,
     "customDomainBoundInVercelUi": true,
     "dnsRecordsUpdated": true,
-    "dnsPropagationVerified": false,
+    "dnsPropagationVerified": true,
+    "customDomainValidInVercelUi": true,
     "customDomainSslVerified": false,
-    "wwwRedirectConfigured": true
+    "wwwRedirectConfigured": true,
+    "runtimeErrorsLastHour": 0
   }
 }
