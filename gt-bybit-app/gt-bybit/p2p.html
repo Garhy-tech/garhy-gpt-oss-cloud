@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#071b3d" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <title>GT.BYBIT · P2P Control</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/gt-bybit/icon-192.png" />
+  <link rel="stylesheet" href="/gt-bybit/p2p-console.css?v=20260908-1" />
+</head>
+<body>
+  <div id="offlineBanner" class="offline hidden">أنت غير متصل بالإنترنت — جميع عمليات P2P متوقفة.</div>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="/assets/gt-bybit/icon-192.png" alt="" />
+      <div><strong>GT.BYBIT</strong><small>P2P CONTROL · GARHY TECH</small></div>
+    </div>
+    <div class="top-actions">
+      <div id="serviceState" class="state" data-state="idle"><span></span><b>مقفلة</b></div>
+      <a class="back" href="/gt-bybit/">العودة للتطبيق</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="authGate" class="auth-card">
+      <div class="auth-copy">
+        <span class="eyebrow">BYBIT P2P OPEN API</span>
+        <h1>مركز عمليات P2P</h1>
+        <p>إدارة الطلبات والإعلانات والمحادثات مع أتمتة مراقبة آمنة. لا يتم تنفيذ Release أو Mark as Paid تلقائيًا.</p>
+      </div>
+      <div class="login-grid">
+        <label><span>BYBIT CONTROL TOKEN</span><input id="controlToken" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="••••••••••••••••••••••••" /></label>
+        <button id="connectBtn" class="btn primary" type="button">فتح جلسة P2P</button>
+      </div>
+      <div class="security-line">Control Token يبقى في ذاكرة الصفحة فقط ولا يوجد قفل تلقائي بمرور الوقت. تنتهي الجلسة عند تسجيل الخروج أو إغلاق/تحديث الصفحة.</div>
+    </section>
+
+    <section id="console" class="hidden">
+      <section class="hero">
+        <div>
+          <span class="eyebrow">LIVE P2P OPERATIONS</span>
+          <h1>P2P Operations Center</h1>
+          <p id="capabilityText">جارٍ التحقق من صلاحيات P2P Open API…</p>
+        </div>
+        <div class="hero-actions">
+          <button id="refreshBtn" class="btn" type="button">تحديث الآن</button>
+          <button id="notifyBtn" class="btn" type="button">تفعيل الإشعارات</button>
+          <button id="logoutBtn" class="btn danger" type="button">تسجيل الخروج</button>
+        </div>
+      </section>
+
+      <div id="permissionAlert" class="alert warning hidden">
+        <strong>P2P Open API غير متاح حاليًا</strong>
+        <span>الواجهة جاهزة، لكنها ستظل في وضع الانتظار حتى تفتح Bybit صلاحيات FiatP2POrder وAdvertising للمفتاح.</span>
+      </div>
+
+      <section class="metrics">
+        <article><span>حالة P2P API</span><strong id="mApi">—</strong><small id="mApiSub">بانتظار الفحص</small></article>
+        <article><span>Pending Orders</span><strong id="mPending">—</strong><small>طلبات تحتاج متابعة</small></article>
+        <article><span>My Ads</span><strong id="mAds">—</strong><small>إعلانات الحساب</small></article>
+        <article><span>آخر مزامنة</span><strong id="mSync">—</strong><small>Auto monitor</small></article>
+      </section>
+
+      <section class="automation card">
+        <div class="card-head">
+          <div><h2>الأتمتة الآمنة</h2><p>مراقبة فقط — لا يتم تحويل أموال أو Release بشكل تلقائي.</p></div>
+          <label class="switch"><input id="autoRefresh" type="checkbox" checked /><span></span><b>تحديث كل 30 ثانية</b></label>
+        </div>
+        <div class="automation-grid">
+          <div><strong>Pending Order Watch</strong><span>يراقب الطلبات الجديدة ويحدث العدادات تلقائيًا.</span></div>
+          <div><strong>Browser Notifications</strong><span>ينبهك عند ظهور طلب Pending جديد بعد السماح بالإشعارات.</span></div>
+          <div><strong>Financial Guard</strong><span>Release وMark as Paid يحتاجان تأكيدًا يدويًا صريحًا في كل مرة.</span></div>
+        </div>
+      </section>
+
+      <section class="grid two">
+        <article class="card">
+          <div class="card-head"><div><h2>الطلبات المعلقة</h2><p>آخر Pending P2P orders</p></div><button id="pendingRefresh" class="mini" type="button">تحديث</button></div>
+          <div id="pendingTable" class="table-wrap"><div class="empty">جارٍ التحميل…</div></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><h2>إعلاناتي</h2><p>الحالة الحالية للإعلانات</p></div><button id="adsRefresh" class="mini" type="button">تحديث</button></div>
+          <div id="adsTable" class="table-wrap"><div class="empty">جارٍ التحميل…</div></div>
+        </article>
+      </section>
+
+      <section class="grid two">
+        <article class="card">
+          <div class="card-head"><div><h2>تفاصيل طلب</h2><p>Order + Counterparty + Chat</p></div></div>
+          <form id="orderLookupForm" class="form">
+            <label><span>ORDER ID</span><input name="orderId" required placeholder="Bybit P2P Order ID" /></label>
+            <button class="btn primary" type="submit">تحميل التفاصيل</button>
+          </form>
+          <div id="orderDetail" class="detail"><div class="empty">أدخل Order ID لعرض التفاصيل.</div></div>
+          <div id="chatMessages" class="messages"></div>
+        </article>
+
+        <article class="card">
+          <div class="card-head"><div><h2>محادثة P2P</h2><p>رسائل يدوية عبر Bybit Open API</p></div></div>
+          <form id="messageForm" class="form">
+            <label><span>ORDER ID</span><input name="orderId" required placeholder="Order ID" /></label>
+            <label class="wide"><span>MESSAGE</span><textarea name="message" required maxlength="1000" placeholder="اكتب الرسالة…"></textarea></label>
+            <button class="btn primary wide" type="submit">إرسال الرسالة</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="grid two critical-grid">
+        <article class="card critical">
+          <div class="card-head"><div><h2>Mark as Paid</h2><p>تنفيذ مالي حساس — تأكيد يدوي إلزامي</p></div></div>
+          <form id="paidForm" class="form">
+            <label><span>ORDER ID</span><input name="orderId" required /></label>
+            <label><span>PAYMENT TYPE</span><input name="paymentType" required placeholder="Payment method ID/type" /></label>
+            <label class="wide"><span>اكتب P2P_PAID للتأكيد</span><input name="confirm" required autocomplete="off" placeholder="P2P_PAID" /></label>
+            <button class="btn warning wide" type="submit">Mark as Paid</button>
+          </form>
+        </article>
+
+        <article class="card critical release">
+          <div class="card-head"><div><h2>Release Assets</h2><p>لا تستخدمها قبل التأكد الفعلي من وصول الدفع</p></div></div>
+          <form id="releaseForm" class="form">
+            <label class="wide"><span>ORDER ID</span><input name="orderId" required /></label>
+            <label class="wide"><span>اكتب RELEASE_P2P للتأكيد</span><input name="confirm" required autocomplete="off" placeholder="RELEASE_P2P" /></label>
+            <button class="btn danger wide" type="submit">Release Assets</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="card system-card">
+        <div class="card-head"><div><h2>حالة النظام</h2><p>تشخيص مباشر دون كشف أي مفاتيح سرية</p></div></div>
+        <div class="system-grid">
+          <div><span>Backend</span><strong>/api/p2p</strong></div>
+          <div><span>Session</span><strong>Memory only</strong></div>
+          <div><span>Idle timeout</span><strong>Disabled</strong></div>
+          <div><span>API cache</span><strong>Disabled</strong></div>
+          <div><span>Auto financial actions</span><strong>Disabled</strong></div>
+          <div><span>Monitor interval</span><strong>30 seconds</strong></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/gt-bybit/p2p-console.js?v=20260908-1" defer></script>
+</body>
+</html>
