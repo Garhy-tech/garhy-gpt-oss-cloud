@@ -1,5 +1,4 @@
 const API = '/api/bybit';
-const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 const VIEW_TITLES = {
   overview: 'الرئيسية',
   trade: 'التداول',
@@ -11,8 +10,6 @@ const VIEW_TITLES = {
 let controlToken = '';
 let lastQuoteTxId = '';
 let installPrompt = null;
-let idleDeadline = 0;
-let idleTimer = null;
 let currentRegion = '—';
 
 const $ = (id) => document.getElementById(id);
@@ -116,29 +113,16 @@ function navigate(view) {
 }
 
 function resetIdleTimer() {
-  if (!controlToken) return;
-  idleDeadline = Date.now() + IDLE_TIMEOUT_MS;
+  if (controlToken && $('sessionClock')) $('sessionClock').textContent = 'مفتوحة';
 }
 
 function startIdleTimer() {
-  resetIdleTimer();
-  clearInterval(idleTimer);
-  idleTimer = setInterval(() => {
-    if (!controlToken) return;
-    const remaining = Math.max(0, idleDeadline - Date.now());
-    const minutes = Math.floor(remaining / 60000);
-    const seconds = Math.floor((remaining % 60000) / 1000);
-    $('sessionClock').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    if (remaining <= 0) lockSession('تم قفل الجلسة تلقائيًا بعد 15 دقيقة من عدم النشاط.');
-  }, 1000);
+  if ($('sessionClock')) $('sessionClock').textContent = 'مفتوحة';
 }
 
-function lockSession(message = 'تم قفل جلسة التحكم ومسح التوكن من الذاكرة.') {
+function lockSession(message = 'تم تسجيل الخروج ومسح Control Token من ذاكرة الصفحة.') {
   controlToken = '';
   lastQuoteTxId = '';
-  idleDeadline = 0;
-  clearInterval(idleTimer);
-  idleTimer = null;
   $('controlToken').value = '';
   $('confirmConvertBtn').classList.add('hidden');
   $('convertQuote').textContent = 'سيظهر سعر التحويل هنا قبل التنفيذ.';
@@ -185,7 +169,6 @@ function renderOrders(payload, category) {
   }
   $('ordersTable').innerHTML = `<table><thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th>Qty</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody>${list.map((o) => `<tr><td class="coin">${escapeHtml(o.symbol)}</td><td class="${o.side === 'Buy' ? 'side-buy' : 'side-sell'}">${escapeHtml(o.side)}</td><td>${escapeHtml(o.orderType)}</td><td>${escapeHtml(o.qty)}</td><td>${escapeHtml(o.price || 'Market')}</td><td>${escapeHtml(o.orderStatus)}</td><td><button class="btn btn--danger btn--small js-cancel" data-category="${escapeHtml(category)}" data-symbol="${escapeHtml(o.symbol)}" data-order-id="${escapeHtml(o.orderId)}" type="button">إلغاء</button></td></tr>`).join('')}</tbody></table>`;
   $$('.js-cancel').forEach((button) => button.addEventListener('click', async () => {
-    resetIdleTimer();
     if (!confirm(`إلغاء الأمر ${button.dataset.orderId} على ${button.dataset.symbol}؟`)) return;
     try {
       await apiPost({ action: 'cancel-order', category: button.dataset.category, symbol: button.dataset.symbol, orderId: button.dataset.orderId });
@@ -215,10 +198,9 @@ async function refreshDashboard(showToast = true) {
   if (!controlToken) return;
   try {
     await loadDashboard();
-    resetIdleTimer();
     if (showToast) toast('تم تحديث بيانات الحساب.', 'success');
   } catch (error) {
-    if (error.status === 401) return lockSession('انتهت أو فشلت جلسة التحكم.');
+    if (error.status === 401) return lockSession('انتهت أو فشلت جلسة التحكم من جهة الخادم.');
     toast(error.message, 'error');
   }
 }
@@ -261,18 +243,16 @@ $('lockSettingsBtn').addEventListener('click', () => lockSession());
 $('refreshBtn').addEventListener('click', () => refreshDashboard());
 $('overviewRefresh').addEventListener('click', () => refreshDashboard());
 $('reloadOrdersBtn').addEventListener('click', async () => {
-  try { await loadOrders(); resetIdleTimer(); toast('تم تحديث الأوامر.', 'success'); } catch (error) { toast(error.message, 'error'); }
+  try { await loadOrders(); toast('تم تحديث الأوامر.', 'success'); } catch (error) { toast(error.message, 'error'); }
 });
 
 $$('[data-view]').forEach((button) => button.addEventListener('click', () => {
   if (!controlToken) return;
-  resetIdleTimer();
   navigate(button.dataset.view);
 }));
 
 $('orderForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  resetIdleTimer();
   const body = formObject(event.currentTarget);
   body.action = 'place-order';
   if (body.orderType === 'Market') delete body.price;
@@ -287,7 +267,6 @@ $('orderForm').addEventListener('submit', async (event) => {
 
 $('leverageForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  resetIdleTimer();
   const body = { action: 'set-leverage', ...formObject(event.currentTarget) };
   if (!confirm(`تحديث Leverage على ${body.symbol} إلى Buy ${body.buyLeverage}x / Sell ${body.sellLeverage}x؟`)) return;
   try { await apiPost(body); toast('تم تحديث Leverage.', 'success'); await refreshDashboard(false); } catch (error) { toast(error.message, 'error'); }
@@ -295,7 +274,6 @@ $('leverageForm').addEventListener('submit', async (event) => {
 
 $('stopForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  resetIdleTimer();
   const body = { action: 'set-trading-stop', ...formObject(event.currentTarget) };
   if (!body.takeProfit && !body.stopLoss && !body.trailingStop) return toast('حدد TP أو SL أو Trailing Stop.', 'error');
   if (!confirm(`تحديث حماية المركز على ${body.symbol}؟`)) return;
@@ -304,7 +282,6 @@ $('stopForm').addEventListener('submit', async (event) => {
 
 $('transferForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  resetIdleTimer();
   const body = { action: 'transfer', ...formObject(event.currentTarget) };
   if (body.fromAccountType === body.toAccountType) return toast('حساب المصدر والوجهة يجب أن يكونا مختلفين.', 'error');
   if (!confirm(`تحويل ${body.amount} ${body.coin} من ${body.fromAccountType} إلى ${body.toAccountType}؟`)) return;
@@ -313,7 +290,6 @@ $('transferForm').addEventListener('submit', async (event) => {
 
 $('convertForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  resetIdleTimer();
   lastQuoteTxId = '';
   $('confirmConvertBtn').classList.add('hidden');
   const body = { action: 'convert-quote', ...formObject(event.currentTarget) };
@@ -329,7 +305,6 @@ $('convertForm').addEventListener('submit', async (event) => {
 });
 
 $('confirmConvertBtn').addEventListener('click', async () => {
-  resetIdleTimer();
   if (!lastQuoteTxId) return;
   if (!confirm('تأكيد تنفيذ Convert الحقيقي بهذا السعر؟')) return;
   try {
@@ -344,7 +319,6 @@ $('confirmConvertBtn').addEventListener('click', async () => {
 
 $('cancelAllForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  resetIdleTimer();
   const body = { action: 'cancel-all', ...formObject(event.currentTarget) };
   if (body.confirm !== 'CANCEL_ALL') return toast('اكتب CANCEL_ALL حرفيًا.', 'error');
   if (!confirm(`تأكيد إلغاء كل الأوامر المطابقة في ${body.category}؟`)) return;
@@ -390,10 +364,6 @@ function updateConnectivity() {
 }
 window.addEventListener('online', updateConnectivity);
 window.addEventListener('offline', updateConnectivity);
-
-['pointerdown', 'keydown', 'touchstart'].forEach((eventName) => {
-  window.addEventListener(eventName, () => resetIdleTimer(), { passive: true });
-});
 
 async function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
