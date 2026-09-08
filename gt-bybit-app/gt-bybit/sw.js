@@ -1,9 +1,12 @@
-const CACHE = 'gt-bybit-shell-v3';
+const CACHE = 'gt-bybit-shell-v4';
 const SHELL = [
   '/gt-bybit/',
   '/gt-bybit/index.html',
   '/gt-bybit/app.css',
   '/gt-bybit/app.js',
+  '/gt-bybit/p2p.html',
+  '/gt-bybit/p2p-console.css',
+  '/gt-bybit/p2p-console.js',
   '/gt-bybit/manifest.webmanifest',
   '/assets/gt-bybit/icon-180.png',
   '/assets/gt-bybit/icon-192.png',
@@ -32,7 +35,6 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
   if (url.origin !== self.location.origin) return;
 
-  // Hero/profile identity uses the exact approved GARHY TECH artwork.
   if (url.pathname === '/assets/gt-bybit/icon-512.png') {
     event.respondWith(
       caches.match('/assets/gt-bybit/gt-profile.jpg')
@@ -45,7 +47,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => response)
-        .catch(() => caches.match('/gt-bybit/index.html'))
+        .catch(() => caches.match(url.pathname === '/gt-bybit/p2p.html' ? '/gt-bybit/p2p.html' : '/gt-bybit/index.html'))
     );
     return;
   }
