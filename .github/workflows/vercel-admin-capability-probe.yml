@@ -1,0 +1,25 @@
+name: Vercel admin capability probe
+
+on:
+  push:
+    paths:
+      - '.github/workflows/vercel-admin-capability-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Check Vercel token availability without exposing it
+        shell: bash
+        run: |
+          if [ -n "$VERCEL_TOKEN" ]; then
+            echo "VERCEL_TOKEN_AVAILABLE=true" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "VERCEL_TOKEN_AVAILABLE=false" >> "$GITHUB_STEP_SUMMARY"
+            exit 2
+          fi
