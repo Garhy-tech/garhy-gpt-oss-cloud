@@ -29,6 +29,11 @@
   ],
   "shortcuts": [
     {
+      "name": "P2P Control",
+      "short_name": "P2P",
+      "url": "/gt-bybit/p2p.html"
+    },
+    {
       "name": "التداول",
       "short_name": "Trade",
       "url": "/gt-bybit/?view=trade"
