@@ -1,18 +1,21 @@
-# GARHY GPT-OSS Cloud — Groq
+# GARHY AI / HANA
 
-Production-ready lightweight Vercel app for testing `openai/gpt-oss-20b` and `openai/gpt-oss-120b` through the Groq OpenAI-compatible API.
+Canonical GARHY AI source repository for the GARHY ecosystem.
 
-## Environment variable
+## Production mapping
 
-Set `GROQ_API_KEY` in Vercel for Production, then redeploy.
+- Product: GARHY AI / HANA
+- Vercel project: `garhy-gpt-oss-cloud`
+- Canonical domains: `garhy.ai`, `www.garhy.ai`
+- GT BYBIT is being separated to its own standalone Vercel project and canonical domain `bybit.garhy.tech`.
 
 ## Deployment
 
-Source repository is connected to the existing Vercel project. Pushes to `main` trigger production deployments.
+The repository is connected to the existing Vercel project. Pushes to `main` are expected to create Production deployments.
 
 ## Security
 
-- API key stays server-side.
+- API keys remain server-side.
 - Same-origin POST protection.
 - Model and reasoning allowlists.
 - Payload/message size limits.
