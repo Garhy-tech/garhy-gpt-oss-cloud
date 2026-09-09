@@ -8,6 +8,10 @@
     "api/p2p.js": {
       "regions": ["fra1"],
       "maxDuration": 10
+    },
+    "api/profile.js": {
+      "regions": ["fra1"],
+      "maxDuration": 10
     }
   },
   "rewrites": [
@@ -17,7 +21,7 @@
     },
     {
       "source": "/assets/gt-bybit/icon-512.png",
-      "destination": "/assets/gt-bybit/icon-512.webp"
+      "destination": "/api/profile"
     }
   ],
   "headers": [
