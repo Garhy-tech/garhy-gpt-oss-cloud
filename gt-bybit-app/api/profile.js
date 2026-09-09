@@ -1,7 +1,7 @@
 const PROFILE_ORIGIN = 'https://bybit.garhy.tech';
 const CHUNKS = Array.from({ length: 8 }, (_, index) => `${PROFILE_ORIGIN}/lib/profile/chunk${index + 1}.txt`);
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.setHeader('Allow', 'GET, HEAD');
     return res.status(405).end();
@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
 
     if (req.method === 'HEAD') return res.status(200).end();
     return res.status(200).send(image);
-  } catch (error) {
+  } catch {
     return res.status(502).json({ ok: false, error: 'PROFILE_ASSET_UNAVAILABLE' });
   }
-};
+}
