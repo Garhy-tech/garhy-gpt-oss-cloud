@@ -1,28 +1,29 @@
-const fs = require('fs');
-const path = require('path');
+const PROFILE_ORIGIN = 'https://bybit.garhy.tech';
+const CHUNKS = Array.from({ length: 8 }, (_, index) => `${PROFILE_ORIGIN}/lib/profile/chunk${index + 1}.txt`);
 
-const chunk1 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk1.txt'), 'utf8').trim();
-const chunk2 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk2.txt'), 'utf8').trim();
-const chunk3 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk3.txt'), 'utf8').trim();
-const chunk4 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk4.txt'), 'utf8').trim();
-const chunk5 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk5.txt'), 'utf8').trim();
-const chunk6 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk6.txt'), 'utf8').trim();
-const chunk7 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk7.txt'), 'utf8').trim();
-const chunk8 = fs.readFileSync(path.join(__dirname, '..', 'lib', 'profile', 'chunk8.txt'), 'utf8').trim();
-
-const image = Buffer.from(chunk1 + chunk2 + chunk3 + chunk4 + chunk5 + chunk6 + chunk7 + chunk8, 'base64');
-
-module.exports = function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.setHeader('Allow', 'GET, HEAD');
     return res.status(405).end();
   }
 
-  res.setHeader('Content-Type', 'image/webp');
-  res.setHeader('Content-Length', String(image.length));
-  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
+  try {
+    const responses = await Promise.all(CHUNKS.map((url) => fetch(url, { cache: 'no-store' })));
+    if (responses.some((response) => !response.ok)) {
+      return res.status(502).json({ ok: false, error: 'PROFILE_ASSET_UNAVAILABLE' });
+    }
 
-  if (req.method === 'HEAD') return res.status(200).end();
-  return res.status(200).send(image);
+    const chunks = await Promise.all(responses.map((response) => response.text()));
+    const image = Buffer.from(chunks.map((chunk) => chunk.trim()).join(''), 'base64');
+
+    res.setHeader('Content-Type', 'image/webp');
+    res.setHeader('Content-Length', String(image.length));
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+
+    if (req.method === 'HEAD') return res.status(200).end();
+    return res.status(200).send(image);
+  } catch (error) {
+    return res.status(502).json({ ok: false, error: 'PROFILE_ASSET_UNAVAILABLE' });
+  }
 };
