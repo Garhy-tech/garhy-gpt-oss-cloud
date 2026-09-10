@@ -1,66 +1,50 @@
-const CACHE = 'gt-bybit-shell-v4';
-const SHELL = [
-  '/gt-bybit/',
+const CACHE='gt-bybit-shell-20260908-2';
+const VERSION='20260908-2';
+const STATIC=[
   '/gt-bybit/index.html',
-  '/gt-bybit/app.css',
-  '/gt-bybit/app.js',
-  '/gt-bybit/p2p.html',
-  '/gt-bybit/p2p-console.css',
-  '/gt-bybit/p2p-console.js',
+  `/gt-bybit/app.css?v=${VERSION}`,
+  `/gt-bybit/app.js?v=${VERSION}`,
+  `/gt-bybit/validation.js?v=${VERSION}`,
   '/gt-bybit/manifest.webmanifest',
-  '/assets/gt-bybit/icon-180.png',
-  '/assets/gt-bybit/icon-192.png',
-  '/assets/gt-bybit/icon-512.webp',
-  '/assets/gt-bybit/gt-profile.jpg'
+  '/assets/gt-bybit/icon-180.png','/assets/gt-bybit/icon-192.png','/assets/gt-bybit/icon-512.png','/assets/gt-bybit/gt-profile.jpg',
 ];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+const ALLOWED=new Set(STATIC.map((path)=>new URL(path,self.location.origin).pathname));
+self.addEventListener('install',(event)=>{
+  event.waitUntil(caches.open(CACHE).then(async(cache)=>{
+    for(const path of STATIC){
+      const request=new Request(path,{cache:'reload',credentials:'omit'});
+      const response=await fetch(request);
+      if(!response.ok)throw new Error('Shell asset unavailable');
+      await cache.put(path,response);
+    }
+    await self.skipWaiting();
+  }));
 });
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key.startsWith('gt-bybit-shell-') && key !== CACHE).map((key) => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate',(event)=>{
+  event.waitUntil((async()=>{
+    for(const key of await caches.keys())if(key.startsWith('gt-bybit-shell-') && key!==CACHE)await caches.delete(key);
+    await self.clients.claim();
+  })());
 });
-
-self.addEventListener('fetch', (event) => {
-  const request = event.request;
-  if (request.method !== 'GET') return;
-  const url = new URL(request.url);
-
-  // Financial/account API traffic is always network-only and never cached.
-  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
-  if (url.origin !== self.location.origin) return;
-
-  if (url.pathname === '/assets/gt-bybit/icon-512.png') {
-    event.respondWith(
-      caches.match('/assets/gt-bybit/gt-profile.jpg')
-        .then((cached) => cached || fetch('/assets/gt-bybit/gt-profile.jpg'))
-    );
+self.addEventListener('fetch',(event)=>{
+  const request=event.request,url=new URL(request.url);
+  if(request.method!=='GET' || url.origin!==self.location.origin || /^\/api(?:\/|$)/.test(url.pathname) || request.headers.has('Authorization'))return;
+  // Only the known public shell can enter CacheStorage. Never cache arbitrary paths or queries.
+  const navigation=request.mode==='navigate' && ['/', '/gt-bybit/', '/gt-bybit/index.html'].includes(url.pathname);
+  if(navigation){
+    if([...url.searchParams.keys()].some((key)=>!['view','source'].includes(key)))return;
+    event.respondWith(fetch(request,{cache:'no-store'}).catch(async()=>await caches.match('/gt-bybit/index.html',{cacheName:CACHE}) || Response.error()));
     return;
   }
-
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => response)
-        .catch(() => caches.match(url.pathname === '/gt-bybit/p2p.html' ? '/gt-bybit/p2p.html' : '/gt-bybit/index.html'))
-    );
-    return;
-  }
-
-  if (url.pathname.startsWith('/gt-bybit/') || url.pathname.startsWith('/assets/gt-bybit/')) {
-    event.respondWith(
-      caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
-        }
-        return response;
-      }))
-    );
-  }
+  if(!ALLOWED.has(url.pathname) || [...url.searchParams.keys()].some((key)=>key!=='v'))return;
+  event.respondWith((async()=>{
+    const cache=await caches.open(CACHE);
+    try{
+      const response=await fetch(request,{cache:'no-cache'});
+      const type=response.headers.get('Content-Type') || '';
+      const valid=(!url.pathname.endsWith('.js') || /javascript/.test(type)) && (!url.pathname.endsWith('.css') || /text\/css/.test(type));
+      if(response.ok && valid)await cache.put(request,response.clone());
+      return response;
+    }catch{return await cache.match(request) || Response.error();}
+  })());
 });

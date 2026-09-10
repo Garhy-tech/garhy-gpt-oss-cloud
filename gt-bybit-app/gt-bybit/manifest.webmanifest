@@ -1,18 +1,24 @@
 {
-  "id": "/gt-bybit/",
+  "id": "/",
   "name": "GT.BYBIT",
   "short_name": "GT.BYBIT",
-  "description": "GT.BYBIT — Secure Bybit control by GARHY TECH",
-  "start_url": "/gt-bybit/",
-  "scope": "/gt-bybit/",
+  "description": "GT.BYBIT — إدارة الحساب والتداول والأصول",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
+  "display_override": [
+    "standalone"
+  ],
   "orientation": "any",
   "background_color": "#03122b",
   "theme_color": "#071b3d",
   "lang": "ar",
   "dir": "rtl",
-  "categories": ["finance", "business", "utilities"],
+  "categories": [
+    "finance",
+    "business",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "/assets/gt-bybit/icon-192.png",
@@ -21,18 +27,13 @@
       "purpose": "any"
     },
     {
-      "src": "/assets/gt-bybit/icon-512.webp",
+      "src": "/assets/gt-bybit/icon-512.png",
       "sizes": "512x512",
-      "type": "image/webp",
+      "type": "image/png",
       "purpose": "any"
     }
   ],
   "shortcuts": [
-    {
-      "name": "P2P Control",
-      "short_name": "P2P",
-      "url": "/gt-bybit/p2p.html"
-    },
     {
       "name": "التداول",
       "short_name": "Trade",
