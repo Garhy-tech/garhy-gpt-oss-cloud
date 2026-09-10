@@ -1,12 +1,13 @@
-const CACHE='gt-bybit-shell-20260910-10';
-const VERSION='20260910-10';
+const CACHE='gt-bybit-shell-20260910-11';
+const VERSION='20260910-11';
 const STATIC=[
   '/gt-bybit/index.html',
   `/gt-bybit/app.css?v=${VERSION}`,
   `/gt-bybit/app.js?v=${VERSION}`,
   `/gt-bybit/validation.js?v=${VERSION}`,
   '/gt-bybit/manifest.webmanifest',
-  '/assets/gt-bybit/icon-180.png','/assets/gt-bybit/icon-192.png','/assets/gt-bybit/icon-512.png','/assets/gt-bybit/gt-profile.jpg',
+  '/assets/gt-bybit/icon-180.png','/assets/gt-bybit/icon-192.png','/assets/gt-bybit/icon-512.png',
+  '/assets/gt-bybit/icon-maskable-192.png','/assets/gt-bybit/icon-maskable-512.png','/assets/gt-bybit/gt-profile.jpg',
 ];
 const ALLOWED=new Set(STATIC.map((path)=>new URL(path,self.location.origin).pathname));
 self.addEventListener('install',(event)=>{
