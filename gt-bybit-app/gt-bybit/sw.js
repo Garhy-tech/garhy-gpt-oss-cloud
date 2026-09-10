@@ -1,5 +1,5 @@
-const CACHE='gt-bybit-shell-20260910-8';
-const VERSION='20260910-8';
+const CACHE='gt-bybit-shell-20260910-9';
+const VERSION='20260910-9';
 const STATIC=[
   '/gt-bybit/index.html',
   `/gt-bybit/app.css?v=${VERSION}`,
