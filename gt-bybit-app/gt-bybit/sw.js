@@ -1,5 +1,5 @@
-const CACHE='gt-bybit-shell-20260910-5';
-const VERSION='20260910-5';
+const CACHE='gt-bybit-shell-20260910-6';
+const VERSION='20260910-6';
 const STATIC=[
   '/gt-bybit/index.html',
   `/gt-bybit/app.css?v=${VERSION}`,
@@ -19,6 +19,10 @@ self.addEventListener('install',(event)=>{
     }
     await self.skipWaiting();
   }));
+});
+self.addEventListener('notificationclick',(event)=>{
+  event.notification.close();
+  event.waitUntil((async()=>{const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});const open=windows.find((client)=>new URL(client.url).origin===self.location.origin);if(open){await open.focus();return;}await self.clients.openWindow(event.notification.data?.url || '/');})());
 });
 self.addEventListener('activate',(event)=>{
   event.waitUntil((async()=>{

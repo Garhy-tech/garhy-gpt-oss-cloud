@@ -4,7 +4,8 @@ const API='/api/bybit';
 const VIEW_TITLES={overview:'الرئيسية',trade:'التداول',risk:'إدارة المخاطر',assets:'الأصول والتحويلات',settings:'الإعدادات والأمان'};
 const $=(id)=>document.getElementById(id);
 const $$=(selector)=>[...document.querySelectorAll(selector)];
-const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false};
+const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false,accountSnapshot:null};
+const NOTIFICATION_PREF='gt-bybit-notifications';
 const sessionChannel='BroadcastChannel' in window ? new BroadcastChannel('gt-bybit-session') : null;
 let toastTimer;
 function toast(message,kind='info') {
@@ -18,6 +19,23 @@ function formatNumber(value,digits=4) {
   const n=Number(value); return Number.isFinite(n) ? new Intl.NumberFormat('en-US',{maximumFractionDigits:digits}).format(n) : '—';
 }
 function formObject(form) { return Object.fromEntries([...new FormData(form).entries()].map(([key,value])=>[key,String(value).trim()]).filter(([,value])=>value!=='')); }
+function notificationsEnabled(){return 'Notification' in window && Notification.permission==='granted' && localStorage.getItem(NOTIFICATION_PREF)==='all';}
+function updateNotificationState(){
+  if(!('Notification' in window)){$('notificationState').textContent='غير مدعومة';$('notificationBtn').disabled=true;return;}
+  const enabled=notificationsEnabled();$('notificationState').textContent=enabled?'جميع الإشعارات مفعّلة':Notification.permission==='denied'?'محظورة من إعدادات الهاتف':'غير مفعّلة';$('notificationBtn').textContent=enabled?'إيقاف الإشعارات':'تفعيل جميع الإشعارات';
+}
+async function notify(title,body,tag){
+  if(!notificationsEnabled())return;
+  const registration=await navigator.serviceWorker?.ready.catch(()=>null);
+  if(registration)await registration.showNotification(title,{body,tag,icon:'/assets/gt-bybit/icon-192.png',badge:'/assets/gt-bybit/icon-192.png',dir:'rtl',lang:'ar',renotify:false,data:{url:'/'}});
+}
+async function toggleNotifications(){
+  if(notificationsEnabled()){localStorage.removeItem(NOTIFICATION_PREF);updateNotificationState();return toast('تم إيقاف إشعارات GT.BYBIT.');}
+  if(!('Notification' in window))return toast('الإشعارات غير مدعومة على هذا المتصفح.','error');
+  const permission=await Notification.requestPermission();
+  if(permission==='granted'){localStorage.setItem(NOTIFICATION_PREF,'all');updateNotificationState();await notify('GT.BYBIT','تم تفعيل جميع إشعارات الحساب والأمان.','gt-bybit-enabled');}
+  else{updateNotificationState();toast('فعّل الإشعارات من إعدادات الموقع في الهاتف.','error');}
+}
 
 async function api(action,{params={},body,allowLocked=false}={}) {
   if(!navigator.onLine) throw new Error('أنت غير متصل. العمليات متوقفة حتى عودة الاتصال.');
@@ -83,7 +101,7 @@ async function connect() {
   const input=$('controlToken');
   if(!input.value.trim())return toast('أدخل رمز التحكم أولًا.','error');
   state.pending.add('connect');$('connectBtn').disabled=true;$('connectBtn').textContent='جارٍ التحقق…';
-  try { const body={controlToken:input.value.trim()};input.value='';const session=await api('login',{body,allowLocked:true});body.controlToken='';await applySession(session);sessionChannel?.postMessage('changed');toast('تم فتح جلسة التحكم.','success'); }
+  try { const body={controlToken:input.value.trim()};input.value='';const session=await api('login',{body,allowLocked:true});body.controlToken='';await applySession(session);sessionChannel?.postMessage('changed');toast('تم فتح جلسة التحكم.','success');await notify('تنبيه أمان GT.BYBIT','تم فتح جلسة تحكم جديدة.','gt-bybit-login'); }
   catch(error) {toast(error.message,'error');}
   finally {input.value='';state.pending.delete('connect');$('connectBtn').disabled=false;$('connectBtn').textContent='فتح الجلسة';}
 }
@@ -133,7 +151,7 @@ async function runMutation(control,input,after=()=>{}) {
     await api(data.action,{body:{...data,confirmed:true,requestId}});
     state.attempts.delete(fingerprint);
     if(data.action==='convert-confirm')clearQuote();
-    toast('استلمت Bybit الطلب. تحقّق من حالته النهائية في سجل الحساب.','success');
+    toast('استلمت Bybit الطلب. تحقّق من حالته النهائية في سجل الحساب.','success');await notify('GT.BYBIT','استلمت Bybit طلب العملية بعد تأكيدك. راجع سجل الحساب للحالة النهائية.',`gt-bybit-${data.action}`);
     try {await after();} catch {toast('قُبل الطلب، لكن تعذر تحديث البيانات. حدّثها يدويًا.');}
   } catch(error){toast(error.message,'error');}
   finally{state.pending.delete('mutation');control.removeAttribute('aria-busy');updateConnectivity();}
@@ -201,7 +219,7 @@ async function refreshDashboard(showToast=true) {
     if(epoch!==state.generation || !state.authenticated)return;
     const rejected=results.filter((r)=>r.status==='rejected');
     if(rejected.length) {setStatus('error','بيانات غير مكتملة');toast(rejected[0].reason.message,'error');}
-    else {setStatus('ok','متصل بـBybit');if(showToast)toast('تم تحديث بيانات الحساب.','success');}
+    else {const next={equity:$('mEquity').textContent,positions:$('mPositions').textContent,orders:$('mOrders').textContent};if(state.accountSnapshot && JSON.stringify(next)!==JSON.stringify(state.accountSnapshot))await notify('تحديث حساب GT.BYBIT','تم رصد تغيير في ملخص الحساب أو المراكز أو الأوامر. افتح التطبيق للمراجعة.','gt-bybit-account-change');state.accountSnapshot=next;setStatus('ok','متصل بـBybit');if(showToast)toast('تم تحديث بيانات الحساب.','success');}
   } finally {state.refreshing=false;updateConnectivity();}
 }
 $('connectBtn').addEventListener('click',connect);
@@ -248,6 +266,7 @@ async function installApp(){
 window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();state.installPrompt=e;$('installBtn').hidden=false;$('installBtn').classList.remove('hidden');});
 window.addEventListener('appinstalled',()=>{state.installPrompt=null;$('installBtn').hidden=true;$('pwaState').textContent='مثبّت';});
 $('installBtn').addEventListener('click',installApp);$('installSettingsBtn').addEventListener('click',installApp);
+$('notificationBtn').addEventListener('click',toggleNotifications);
 function updateConnectivity(){
   const offline=!navigator.onLine;$('offlineBanner').hidden=!offline;$('offlineBanner').classList.toggle('hidden',!offline);
   if(offline)setStatus('error','غير متصل');
@@ -270,7 +289,7 @@ async function registerServiceWorker(){
   }catch{$('pwaState').textContent='تعذر تهيئة العمل دون اتصال';}
 }
 async function boot(){
-  setUnlocked(false);navigate(new URL(location.href).searchParams.get('view'));updateOrderFields();
+  setUnlocked(false);navigate(new URL(location.href).searchParams.get('view'));updateOrderFields();updateNotificationState();
   const results=await Promise.allSettled([api('health',{allowLocked:true}),api('session',{allowLocked:true}),registerServiceWorker()]);
   const health=results[0].status==='fulfilled'?results[0].value:null;
   if(health){state.region=health.region;state.mutationsEnabled=health.mutationsEnabled;$('regionLabel').textContent=state.region;$('settingsRegion').textContent=state.region;$('mutationsState').textContent=state.mutationsEnabled?'مفعّل بتأكيد يدوي':'معطّل';$('preAuthState').textContent=!health.sessionStoreReady?'خدمة الجلسات غير مهيأة':!health.controlReady?'رمز التحكم غير مهيأ':!health.bybitConfigured?'مفاتيح Bybit غير مهيأة':'جاهز لتسجيل الدخول';setStatus(health.controlReady?'idle':'error',health.controlReady?'مقفلة':'الإعداد غير مكتمل');}
