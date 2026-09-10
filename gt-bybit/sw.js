@@ -1,18 +1,18 @@
-const CACHE = 'gt-bybit-shell-v3';
+const CACHE = 'gt-bybit-shell-v4';
 const SHELL = [
   '/gt-bybit/',
   '/gt-bybit/index.html',
-  '/gt-bybit/app.css',
-  '/gt-bybit/app.js',
   '/gt-bybit/manifest.webmanifest',
   '/assets/gt-bybit/icon-180.png',
-  '/assets/gt-bybit/icon-192.png',
-  '/assets/gt-bybit/icon-512.webp',
-  '/assets/gt-bybit/gt-profile.jpg'
+  '/assets/gt-bybit/icon-192.png'
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(CACHE)
+      .then((cache) => cache.addAll(SHELL))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -26,26 +26,27 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
+
   const url = new URL(request.url);
-
-  // Financial/account API traffic is always network-only and never cached.
-  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
   if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
 
-  // Hero/profile identity uses the exact approved GARHY TECH artwork.
-  if (url.pathname === '/assets/gt-bybit/icon-512.png') {
+  if (request.mode === 'navigate') {
     event.respondWith(
-      caches.match('/assets/gt-bybit/gt-profile.jpg')
-        .then((cached) => cached || fetch('/assets/gt-bybit/gt-profile.jpg'))
+      fetch(request).catch(() => caches.match('/gt-bybit/index.html'))
     );
     return;
   }
 
-  if (request.mode === 'navigate') {
+  if (url.pathname === '/gt-bybit/app.css' || url.pathname === '/gt-bybit/app.js' || url.pathname.startsWith('/gt-bybit-app/gt-bybit/')) {
     event.respondWith(
-      fetch(request)
-        .then((response) => response)
-        .catch(() => caches.match('/gt-bybit/index.html'))
+      fetch(request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      }).catch(() => caches.match(request))
     );
     return;
   }
