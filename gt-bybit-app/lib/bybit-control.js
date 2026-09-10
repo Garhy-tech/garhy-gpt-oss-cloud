@@ -7,7 +7,7 @@ const random = () => crypto.randomBytes(32).toString('base64url');
 const safeEqual = (a, b) => crypto.timingSafeEqual(Buffer.from(hash(String(a || ''))), Buffer.from(hash(String(b || ''))));
 
 export function isControlConfigured(env = process.env) {
-  return typeof env.BYBIT_CONTROL_TOKEN === 'string' && env.BYBIT_CONTROL_TOKEN.trim().length >= 32;
+  return typeof env.BYBIT_CONTROL_TOKEN === 'string' && env.BYBIT_CONTROL_TOKEN.trim().length >= 8;
 }
 
 export function sessionLifetime(env = process.env) {
@@ -53,7 +53,7 @@ export function createSessionService({ store, env = process.env, now = Date.now 
     rateLimit, authenticate,
     async login(req, res, token) {
       verifyOrigin(req, env);
-      assert(isControlConfigured(env), 'CONTROL_NOT_CONFIGURED', 'يلزم إعداد رمز تحكم قوي على الخادم.', 503);
+      assert(isControlConfigured(env), 'CONTROL_NOT_CONFIGURED', 'يلزم إعداد رمز التحكم على الخادم.', 503);
       const ip = env.VERCEL ? req.headers['x-vercel-forwarded-for'] : req.socket?.remoteAddress;
       await rateLimit(`login:${ip || 'unknown'}`, 10, 600);
       assert(typeof token === 'string' && token.length <= 512 && safeEqual(token.trim(), env.BYBIT_CONTROL_TOKEN.trim()), 'UNAUTHORIZED', 'رمز التحكم غير صحيح.', 401);
