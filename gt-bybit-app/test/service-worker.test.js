@@ -18,5 +18,5 @@ test('service worker ignores every API, money, cross-origin, authorization and u
   assert.equal(w.fetched,0);assert.equal(w.puts.length,0);
 });
 test('service worker purges only old GT.BYBIT caches and claims clients',async()=>{
-  const w=worker();let pending;w.handlers.activate({waitUntil(promise){pending=promise;}});await pending;assert.deepEqual(w.deleted,['gt-bybit-shell-v3']);assert.equal(w.claimed,true);
+  const w=worker();let pending;w.handlers.activate({waitUntil(promise){pending=promise;}});await pending;assert.deepEqual(w.deleted,['gt-bybit-shell-v3','gt-bybit-shell-20260908-2']);assert.equal(w.claimed,true);
 });
