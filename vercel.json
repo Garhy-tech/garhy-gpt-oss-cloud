@@ -21,9 +21,6 @@
   "rewrites": [
     {
       "source": "/",
-      "has": [
-        { "type": "header", "key": "host", "value": "bybit.garhy.tech" }
-      ],
       "destination": "/gt-bybit/"
     },
     {
