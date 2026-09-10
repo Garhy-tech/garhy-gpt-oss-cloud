@@ -6,6 +6,8 @@ const $=(id)=>document.getElementById(id);
 const $$=(selector)=>[...document.querySelectorAll(selector)];
 const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false,accountSnapshot:null};
 const NOTIFICATION_PREF='gt-bybit-notifications';
+const NOTIFICATION_ON='enabled';
+const NOTIFICATION_OFF='disabled';
 const sessionChannel='BroadcastChannel' in window ? new BroadcastChannel('gt-bybit-session') : null;
 let toastTimer;
 function toast(message,kind='info') {
@@ -19,10 +21,20 @@ function formatNumber(value,digits=4) {
   const n=Number(value); return Number.isFinite(n) ? new Intl.NumberFormat('en-US',{maximumFractionDigits:digits}).format(n) : '—';
 }
 function formObject(form) { return Object.fromEntries([...new FormData(form).entries()].map(([key,value])=>[key,String(value).trim()]).filter(([,value])=>value!=='')); }
-function notificationsEnabled(){return 'Notification' in window && Notification.permission==='granted' && localStorage.getItem(NOTIFICATION_PREF)==='all';}
+function notificationPreference(){
+  try{return localStorage.getItem(NOTIFICATION_PREF);}catch{return null;}
+}
+function persistNotificationPreference(value){
+  try{localStorage.setItem(NOTIFICATION_PREF,value);return true;}catch{return false;}
+}
+function notificationsEnabled(){
+  return 'Notification' in window && Notification.permission==='granted' && notificationPreference()!==NOTIFICATION_OFF;
+}
 function updateNotificationState(){
   if(!('Notification' in window)){$('notificationState').textContent='غير مدعومة';$('notificationBtn').disabled=true;return;}
-  const enabled=notificationsEnabled();$('notificationState').textContent=enabled?'جميع الإشعارات مفعّلة':Notification.permission==='denied'?'محظورة من إعدادات الهاتف':'غير مفعّلة';$('notificationBtn').textContent=enabled?'إيقاف الإشعارات':'تفعيل جميع الإشعارات';
+  const enabled=notificationsEnabled();
+  $('notificationState').textContent=enabled?'مفعّلة باستمرار حتى إيقافها يدويًا':Notification.permission==='denied'?'محظورة من إعدادات الهاتف':notificationPreference()===NOTIFICATION_OFF?'متوقفة يدويًا':'غير مفعّلة';
+  $('notificationBtn').textContent=enabled?'إيقاف الإشعارات يدويًا':'تفعيل الإشعارات باستمرار';
 }
 async function notify(title,body,tag){
   if(!notificationsEnabled())return;
@@ -30,11 +42,24 @@ async function notify(title,body,tag){
   if(registration)await registration.showNotification(title,{body,tag,icon:'/assets/gt-bybit/icon-192.png',badge:'/assets/gt-bybit/icon-192.png',dir:'rtl',lang:'ar',renotify:false,data:{url:'/'}});
 }
 async function toggleNotifications(){
-  if(notificationsEnabled()){localStorage.removeItem(NOTIFICATION_PREF);updateNotificationState();return toast('تم إيقاف إشعارات GT.BYBIT.');}
+  if(notificationsEnabled()){
+    persistNotificationPreference(NOTIFICATION_OFF);updateNotificationState();
+    return toast('تم إيقاف إشعارات GT.BYBIT يدويًا.');
+  }
   if(!('Notification' in window))return toast('الإشعارات غير مدعومة على هذا المتصفح.','error');
-  const permission=await Notification.requestPermission();
-  if(permission==='granted'){localStorage.setItem(NOTIFICATION_PREF,'all');updateNotificationState();await notify('GT.BYBIT','تم تفعيل جميع إشعارات الحساب والأمان.','gt-bybit-enabled');}
+  const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();
+  if(permission==='granted'){
+    if(!persistNotificationPreference(NOTIFICATION_ON))return toast('تعذر حفظ اختيار الإشعارات على هذا الجهاز.','error');
+    updateNotificationState();await notify('GT.BYBIT','الإشعارات مفعّلة باستمرار ولن تتوقف إلا عند إيقافها يدويًا.','gt-bybit-enabled');
+  }
   else{updateNotificationState();toast('فعّل الإشعارات من إعدادات الموقع في الهاتف.','error');}
+}
+async function monitorNotificationPermission(){
+  if(!navigator.permissions?.query || !('Notification' in window))return;
+  try{
+    const status=await navigator.permissions.query({name:'notifications'});
+    status.addEventListener('change',updateNotificationState);
+  }catch{}
 }
 
 async function api(action,{params={},body,allowLocked=false}={}) {
@@ -267,6 +292,9 @@ window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();state.ins
 window.addEventListener('appinstalled',()=>{state.installPrompt=null;$('installBtn').hidden=true;$('pwaState').textContent='مثبّت';});
 $('installBtn').addEventListener('click',installApp);$('installSettingsBtn').addEventListener('click',installApp);
 $('notificationBtn').addEventListener('click',toggleNotifications);
+window.addEventListener('storage',(event)=>{if(event.key===NOTIFICATION_PREF)updateNotificationState();});
+window.addEventListener('focus',updateNotificationState);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateNotificationState();});
 function updateConnectivity(){
   const offline=!navigator.onLine;$('offlineBanner').hidden=!offline;$('offlineBanner').classList.toggle('hidden',!offline);
   if(offline)setStatus('error','غير متصل');
@@ -290,7 +318,7 @@ async function registerServiceWorker(){
 }
 async function boot(){
   setUnlocked(false);navigate(new URL(location.href).searchParams.get('view'));updateOrderFields();updateNotificationState();
-  const results=await Promise.allSettled([api('health',{allowLocked:true}),api('session',{allowLocked:true}),registerServiceWorker()]);
+  const results=await Promise.allSettled([api('health',{allowLocked:true}),api('session',{allowLocked:true}),registerServiceWorker(),monitorNotificationPermission()]);
   const health=results[0].status==='fulfilled'?results[0].value:null;
   if(health){state.region=health.region;state.mutationsEnabled=health.mutationsEnabled;$('regionLabel').textContent=state.region;$('settingsRegion').textContent=state.region;$('mutationsState').textContent=state.mutationsEnabled?'مفعّل بتأكيد يدوي':'معطّل';$('preAuthState').textContent=!health.sessionStoreReady?'خدمة الجلسات غير مهيأة':!health.controlReady?'رمز التحكم غير مهيأ':!health.bybitConfigured?'مفاتيح Bybit غير مهيأة':'جاهز لتسجيل الدخول';setStatus(health.controlReady?'idle':'error',health.controlReady?'مقفلة':'الإعداد غير مكتمل');}
   else{$('preAuthState').textContent=navigator.onLine?'تعذر الوصول إلى الخدمة':'غير متصل بالإنترنت';setStatus('error','غير متاح');}

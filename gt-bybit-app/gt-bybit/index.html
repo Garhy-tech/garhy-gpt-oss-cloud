@@ -15,7 +15,7 @@
   <link rel="manifest" href="/gt-bybit/manifest.webmanifest" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/gt-bybit/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/gt-bybit/icon-180.png" />
-  <link rel="stylesheet" href="/gt-bybit/app.css?v=20260910-9" />
+  <link rel="stylesheet" href="/gt-bybit/app.css?v=20260910-10" />
 </head>
 <body data-locked="true">
   <noscript>يلزم تشغيل JavaScript لاستخدام لوحة التحكم. لا يمكن تنفيذ العمليات بدونه.</noscript>
@@ -185,7 +185,7 @@
             <div class="section-head"><div><h2>الإعدادات والأمان</h2><p>حالة التطبيق والجلسة وإعدادات التثبيت.</p></div></div>
             <div class="settings-grid">
               <article class="setting"><h3>تطبيق GT.BYBIT</h3><p>يمكن تثبيت هذه الواجهة كتطبيق مستقل على Android/Desktop من المتصفح.</p><button id="installSettingsBtn" class="btn btn--primary" type="button">تثبيت GT.BYBIT</button></article>
-              <article class="setting"><h3>إشعارات الهاتف</h3><p>تنبيهات الحساب والأوامر والمراكز والأمان أثناء تشغيل التطبيق، دون تضمين بيانات حساسة داخل الإشعار.</p><button id="notificationBtn" class="btn btn--primary" type="button">تفعيل جميع الإشعارات</button><div class="app-meta"><div class="meta-row"><span>الحالة</span><strong id="notificationState">غير مفعّلة</strong></div></div></article>
+              <article class="setting"><h3>إشعارات الهاتف</h3><p>بعد تفعيلها يظل اختيارك محفوظًا عند تحديث الصفحة وإعادة فتح التطبيق، ولا تتوقف من داخل GT.BYBIT إلا عندما توقفها يدويًا. لا تتضمن الإشعارات بيانات حساسة.</p><button id="notificationBtn" class="btn btn--primary" type="button">تفعيل الإشعارات باستمرار</button><div class="app-meta"><div class="meta-row"><span>الحالة</span><strong id="notificationState">غير مفعّلة</strong></div></div></article>
               <article class="setting"><h3>تسجيل الخروج</h3><p>ينهي جلسة التحكم على الخادم ويحذف ملف تعريف الجلسة من الجهاز.</p><button id="lockSettingsBtn" class="btn btn--danger" type="button">تسجيل الخروج</button></article>
               <article class="setting"><h3>حالة النظام</h3><div class="app-meta"><div class="meta-row"><span>App</span><strong>GT.BYBIT</strong></div><div class="meta-row"><span>API</span><strong>Bybit V5</strong></div><div class="meta-row"><span>نوع الحساب</span><strong id="settingsAccount">—</strong></div><div class="meta-row"><span>منطقة الخادم</span><strong id="settingsRegion">—</strong></div><div class="meta-row"><span>PWA</span><strong id="pwaState">Browser</strong></div></div></article>
               <article class="setting"><h3>سياسة الجلسة</h3><p id="sessionPolicy">لا يوجد قفل بسبب الخمول. مدة الأمان المطلقة 30 يومًا افتراضيًا، ويمكن ضبطها على الخادم.</p><div class="app-meta"><div class="meta-row"><span>حماية الجلسة</span><strong>Secure · HttpOnly</strong></div><div class="meta-row"><span>انتهاء الصلاحية المطلق</span><strong id="sessionExpiry">—</strong></div><div class="meta-row"><span>تنفيذ العمليات المالية</span><strong id="mutationsState">جارٍ الفحص</strong></div></div></article>
@@ -213,6 +213,6 @@
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/gt-bybit/app.js?v=20260910-9" type="module"></script>
+  <script src="/gt-bybit/app.js?v=20260910-10" type="module"></script>
 </body>
 </html>
