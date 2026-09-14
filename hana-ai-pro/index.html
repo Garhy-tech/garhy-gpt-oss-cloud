@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#061120" />
+  <meta name="description" content="Hana AI Pro by GARHY TECH — professional AI workspace for software engineering, debugging, website and store audits, automation and technical reports." />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Hana AI Pro — GARHY TECH</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Hana AI Pro navigation">
+      <div class="brand">
+        <div class="brand-mark">H</div>
+        <div>
+          <strong>Hana AI Pro</strong>
+          <span>GARHY TECH</span>
+        </div>
+      </div>
+
+      <nav class="nav-stack">
+        <button class="nav-item active" data-view="chat">المحادثة</button>
+        <button class="nav-item" data-view="audit">فحص موقع / متجر</button>
+        <button class="nav-item" data-view="reports">التقارير</button>
+        <button class="nav-item" data-view="plans">الاشتراك</button>
+      </nav>
+
+      <div class="plan-card compact">
+        <span class="eyebrow">الخطة الحالية</span>
+        <strong id="currentPlan">غير مفعلة</strong>
+        <span id="usageLine">سجّل الدخول لتفعيل Hana AI Pro</span>
+      </div>
+
+      <button class="ghost wide" id="languageButton" type="button">English</button>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">GARHY AI / PROFESSIONAL WORKSPACE</span>
+          <h1>Hana AI Pro</h1>
+        </div>
+        <div class="top-actions">
+          <span class="status-dot"><i></i> Secure workspace</span>
+          <button class="ghost" id="accountButton" type="button">تسجيل الدخول</button>
+        </div>
+      </header>
+
+      <section class="view active" id="view-chat">
+        <div class="hero-card">
+          <div>
+            <span class="eyebrow">BUILD · DEBUG · AUDIT · REPORT</span>
+            <h2>مساعد هندسي احترافي للعمل الحقيقي</h2>
+            <p>برمجة، مراجعة كود، اكتشاف أخطاء، تحليل متاجر ومواقع، هندسة أنظمة، DevOps، QA وتقارير تقنية قابلة للتنفيذ.</p>
+          </div>
+          <div class="capability-grid">
+            <span>Code Review</span><span>Debugging</span><span>Web Audit</span><span>Store Audit</span><span>Architecture</span><span>Reports</span>
+          </div>
+        </div>
+
+        <div class="chat-card">
+          <div class="chat-toolbar">
+            <div>
+              <strong>Hana</strong>
+              <span>Professional engineering assistant</span>
+            </div>
+            <select id="modeSelect" aria-label="Hana mode">
+              <option value="engineering">Engineering</option>
+              <option value="debugging">Debugging</option>
+              <option value="review">Code Review</option>
+              <option value="architecture">Architecture</option>
+              <option value="report">Professional Report</option>
+            </select>
+          </div>
+
+          <div class="messages" id="messages" aria-live="polite">
+            <article class="message assistant">
+              <div class="avatar">H</div>
+              <div class="bubble">
+                <strong>Hana</strong>
+                <p>أرسل الكود، الخطأ، الـ logs، وصف النظام أو المشكلة التي تريد تحليلها. سأرتب الأسباب حسب الأولوية وأعطيك خطوات إصلاح واضحة.</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="quick-grid" id="quickGrid">
+            <button type="button">راجع هذا الكود واكتشف المشاكل</button>
+            <button type="button">حلل خطأ Production</button>
+            <button type="button">صمم Architecture قابلة للتوسع</button>
+            <button type="button">أنشئ تقرير تقني احترافي</button>
+          </div>
+
+          <form class="composer" id="chatForm">
+            <textarea id="chatInput" rows="4" maxlength="12000" placeholder="اكتب طلبك، الصق الكود أو الـ logs هنا..." required></textarea>
+            <div class="composer-footer">
+              <span>لا تضع أسرارًا أو مفاتيح API داخل المحادثة.</span>
+              <button class="primary" type="submit">إرسال إلى Hana</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="view" id="view-audit">
+        <div class="section-heading">
+          <span class="eyebrow">PASSIVE WEBSITE & STORE AUDIT</span>
+          <h2>فحص موقع أو متجر</h2>
+          <p>فحص دفاعي غير تدخلي للـ UX، SEO، Performance، Security headers، بنية الصفحات ومشاكل الجودة الظاهرة.</p>
+        </div>
+
+        <form class="audit-form" id="auditForm">
+          <label>
+            رابط الموقع أو المتجر
+            <input id="auditUrl" type="url" placeholder="https://example.com" required />
+          </label>
+          <button class="primary" type="submit">ابدأ الفحص</button>
+        </form>
+
+        <div class="audit-empty" id="auditResult">
+          <strong>لم يبدأ أي فحص بعد.</strong>
+          <p>أدخل رابطًا عامًا تملك صلاحية فحصه، ثم ابدأ التحليل.</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-reports">
+        <div class="section-heading">
+          <span class="eyebrow">PROFESSIONAL OUTPUT</span>
+          <h2>التقارير</h2>
+          <p>تقارير هندسية منظمة: Executive Summary، Severity، Evidence، Recommended Fix، Verification Steps.</p>
+        </div>
+        <div class="report-grid">
+          <article><strong>Bug Report</strong><span>Root cause + reproduction + fix + verification</span></article>
+          <article><strong>Website Audit</strong><span>UX + performance + SEO + security findings</span></article>
+          <article><strong>Architecture Review</strong><span>Risks + scalability + maintainability + roadmap</span></article>
+          <article><strong>Release Readiness</strong><span>Pre-production checklist and blocking issues</span></article>
+        </div>
+      </section>
+
+      <section class="view" id="view-plans">
+        <div class="section-heading">
+          <span class="eyebrow">MONTHLY SUBSCRIPTIONS</span>
+          <h2>اختر مستوى Hana AI Pro</h2>
+          <p>الأسعار الحالية معدّة للاختبار عبر Stripe Test Mode حتى اكتمال التحقق التجاري.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="price-card">
+            <span class="eyebrow">STARTER</span><h3>$50 <small>/ شهر</small></h3>
+            <p>للمطور الفردي والعمل التقني المركز.</p>
+            <ul><li>Professional AI chat</li><li>Coding & debugging</li><li>Technical analysis</li><li>Professional reports</li></ul>
+            <a class="primary link-button" href="https://buy.stripe.com/test_28E14nb5Hfi65Ev0LQ5wI00" target="_blank" rel="noopener">اختبار الاشتراك</a>
+          </article>
+          <article class="price-card featured">
+            <span class="eyebrow">PRO</span><h3>$150 <small>/ شهر</small></h3>
+            <p>للمطورين المحترفين والتحليل الأعمق.</p>
+            <ul><li>Everything in Starter</li><li>Advanced code review</li><li>Website/store inspection</li><li>Priority reports</li></ul>
+            <a class="primary link-button" href="https://buy.stripe.com/test_5kQ6oHflX5Hw2sj7ae5wI01" target="_blank" rel="noopener">اختبار الاشتراك</a>
+          </article>
+          <article class="price-card">
+            <span class="eyebrow">BUSINESS</span><h3>$350 <small>/ شهر</small></h3>
+            <p>للفرق والتدقيقات المتكررة.</p>
+            <ul><li>Everything in Pro</li><li>Team-grade audits</li><li>Bug remediation reports</li><li>Expanded usage</li></ul>
+            <a class="primary link-button" href="https://buy.stripe.com/test_cNi00j2zbb1Q5Evcuy5wI02" target="_blank" rel="noopener">اختبار الاشتراك</a>
+          </article>
+          <article class="price-card">
+            <span class="eyebrow">SCALE</span><h3>$1000 <small>/ شهر</small></h3>
+            <p>للعمل الهندسي عالي الحجم.</p>
+            <ul><li>Everything in Business</li><li>Highest usage tier</li><li>Advanced audit workflows</li><li>Priority scale support</li></ul>
+            <a class="primary link-button" href="https://buy.stripe.com/test_28E6oHa1Dgmaeb1cuy5wI03" target="_blank" rel="noopener">اختبار الاشتراك</a>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
