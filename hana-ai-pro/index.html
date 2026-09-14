@@ -3,37 +3,65 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#061120" />
+  <meta name="theme-color" content="#050b14" />
+  <meta name="color-scheme" content="dark" />
   <meta name="description" content="Hana AI Pro by GARHY TECH — professional AI workspace for software engineering, debugging, website and store audits, automation and technical reports." />
   <meta name="robots" content="noindex,nofollow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Hana AI Pro — GARHY TECH" />
+  <meta property="og:description" content="Build, debug, audit and report with Hana AI Pro." />
+  <meta property="og:image" content="/og-hana.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Hana AI Pro — GARHY TECH" />
+  <meta name="twitter:description" content="Professional AI workspace for engineering, debugging, audits and technical reports." />
+  <meta name="twitter:image" content="/og-hana.svg" />
   <title>Hana AI Pro — GARHY TECH</title>
+  <link rel="icon" href="/assets/garhy-mark.webp" type="image/webp" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+
   <div class="app-shell">
     <aside class="sidebar" aria-label="Hana AI Pro navigation">
-      <div class="brand">
-        <div class="brand-mark">H</div>
-        <div>
-          <strong>Hana AI Pro</strong>
-          <span>GARHY TECH</span>
+      <div class="brand-lockup">
+        <img class="brand-logo" src="/assets/garhy-mark.webp" alt="GARHY TECH" width="52" height="52" />
+        <div class="brand-copy">
+          <span class="brand-name">Hana AI Pro</span>
+          <span class="brand-parent">BY GARHY TECH</span>
         </div>
       </div>
 
+      <div class="identity-chip">
+        <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-hana alt="Hana" width="44" height="44" />
+        <div>
+          <strong>Hana</strong>
+          <span>Engineering AI Assistant</span>
+        </div>
+        <i aria-hidden="true"></i>
+      </div>
+
       <nav class="nav-stack">
-        <button class="nav-item active" data-view="chat">المحادثة</button>
-        <button class="nav-item" data-view="audit">فحص موقع / متجر</button>
-        <button class="nav-item" data-view="reports">التقارير</button>
-        <button class="nav-item" data-view="plans">الاشتراك</button>
+        <button class="nav-item active" data-view="chat" type="button"><span>01</span>المحادثة</button>
+        <button class="nav-item" data-view="audit" type="button"><span>02</span>فحص موقع / متجر</button>
+        <button class="nav-item" data-view="reports" type="button"><span>03</span>التقارير</button>
+        <button class="nav-item" data-view="plans" type="button"><span>04</span>الاشتراك</button>
       </nav>
 
+      <div class="side-spacer"></div>
+
       <div class="plan-card compact">
-        <span class="eyebrow">الخطة الحالية</span>
+        <span class="eyebrow">CURRENT PLAN</span>
         <strong id="currentPlan">غير مفعلة</strong>
         <span id="usageLine">سجّل الدخول لتفعيل Hana AI Pro</span>
       </div>
 
-      <button class="ghost wide" id="languageButton" type="button">English</button>
+      <div class="sidebar-footer">
+        <span>IDEAS · SOLUTIONS · GROWTH</span>
+        <button class="ghost wide" id="languageButton" type="button">English</button>
+      </div>
     </aside>
 
     <main class="main-panel">
@@ -49,22 +77,35 @@
       </header>
 
       <section class="view active" id="view-chat">
-        <div class="hero-card">
-          <div>
+        <article class="hero-card">
+          <div class="hero-copy">
             <span class="eyebrow">BUILD · DEBUG · AUDIT · REPORT</span>
-            <h2>مساعد هندسي احترافي للعمل الحقيقي</h2>
-            <p>برمجة، مراجعة كود، اكتشاف أخطاء، تحليل متاجر ومواقع، هندسة أنظمة، DevOps، QA وتقارير تقنية قابلة للتنفيذ.</p>
+            <h2>ذكاء هندسي حقيقي.<br><em>بهوية GARHY TECH.</em></h2>
+            <p>Hana هي مساعدتك الذكية للعمل التقني الاحترافي: برمجة، مراجعة كود، Debugging، Architecture، تحليل مواقع ومتاجر، وتقارير قابلة للتنفيذ.</p>
+            <div class="hero-points" aria-label="Hana capabilities">
+              <span>Code Intelligence</span>
+              <span>Bug Analysis</span>
+              <span>Architecture</span>
+              <span>Technical Reports</span>
+            </div>
           </div>
-          <div class="capability-grid">
-            <span>Code Review</span><span>Debugging</span><span>Web Audit</span><span>Store Audit</span><span>Architecture</span><span>Reports</span>
-          </div>
-        </div>
 
-        <div class="chat-card">
+          <div class="hero-identity">
+            <div class="hero-frame">
+              <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-hana alt="Hana — GARHY TECH AI assistant" width="720" height="900" fetchpriority="high" />
+              <div class="hero-badge">
+                <img src="/assets/garhy-mark.webp" alt="" width="32" height="32" />
+                <div><strong>Hana</strong><span>Official GARHY TECH AI</span></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="chat-card">
           <div class="chat-toolbar">
-            <div>
-              <strong>Hana</strong>
-              <span>Professional engineering assistant</span>
+            <div class="assistant-title">
+              <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-hana alt="Hana" width="42" height="42" />
+              <div><strong>Hana</strong><span>Professional engineering assistant</span></div>
             </div>
             <select id="modeSelect" aria-label="Hana mode">
               <option value="engineering">Engineering</option>
@@ -77,10 +118,10 @@
 
           <div class="messages" id="messages" aria-live="polite">
             <article class="message assistant">
-              <div class="avatar">H</div>
+              <img class="avatar assistant-avatar" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-hana alt="Hana" width="38" height="38" />
               <div class="bubble">
                 <strong>Hana</strong>
-                <p>أرسل الكود، الخطأ، الـ logs، وصف النظام أو المشكلة التي تريد تحليلها. سأرتب الأسباب حسب الأولوية وأعطيك خطوات إصلاح واضحة.</p>
+                <p>أرسل الكود، الخطأ، الـ logs، وصف النظام أو المشكلة. سأحللها هندسيًا وأرتب الأسباب والحلول حسب الأولوية.</p>
               </div>
             </article>
           </div>
@@ -99,14 +140,17 @@
               <button class="primary" type="submit">إرسال إلى Hana</button>
             </div>
           </form>
-        </div>
+        </article>
       </section>
 
       <section class="view" id="view-audit">
-        <div class="section-heading">
-          <span class="eyebrow">PASSIVE WEBSITE & STORE AUDIT</span>
-          <h2>فحص موقع أو متجر</h2>
-          <p>فحص دفاعي غير تدخلي للـ UX، SEO، Performance، Security headers، بنية الصفحات ومشاكل الجودة الظاهرة.</p>
+        <div class="section-heading identity-heading">
+          <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-hana alt="Hana" width="56" height="56" />
+          <div>
+            <span class="eyebrow">PASSIVE WEBSITE & STORE AUDIT</span>
+            <h2>فحص موقع أو متجر</h2>
+            <p>واجهة فحص دفاعي غير تدخلي للـ UX، SEO، Performance، Security headers، بنية الصفحات ومشاكل الجودة الظاهرة.</p>
+          </div>
         </div>
 
         <form class="audit-form" id="auditForm">
@@ -114,34 +158,40 @@
             رابط الموقع أو المتجر
             <input id="auditUrl" type="url" placeholder="https://example.com" required />
           </label>
-          <button class="primary" type="submit">ابدأ الفحص</button>
+          <button class="primary" type="submit">تجهيز الفحص</button>
         </form>
 
         <div class="audit-empty" id="auditResult">
-          <strong>لم يبدأ أي فحص بعد.</strong>
-          <p>أدخل رابطًا عامًا تملك صلاحية فحصه، ثم ابدأ التحليل.</p>
+          <img src="/assets/garhy-mark.webp" alt="" width="52" height="52" />
+          <div><strong>لم يبدأ أي فحص بعد.</strong><p>أدخل رابطًا عامًا تملك صلاحية فحصه. لن ندّعي تنفيذ أي فحص أو تغيير قبل تفعيل Audit API.</p></div>
         </div>
       </section>
 
       <section class="view" id="view-reports">
-        <div class="section-heading">
-          <span class="eyebrow">PROFESSIONAL OUTPUT</span>
-          <h2>التقارير</h2>
-          <p>تقارير هندسية منظمة: Executive Summary، Severity، Evidence، Recommended Fix، Verification Steps.</p>
+        <div class="section-heading identity-heading">
+          <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-hana alt="Hana" width="56" height="56" />
+          <div>
+            <span class="eyebrow">PROFESSIONAL OUTPUT</span>
+            <h2>تقارير واضحة وقابلة للتنفيذ</h2>
+            <p>مخرجات هندسية منظمة: Executive Summary، Severity، Evidence، Recommended Fix، Verification Steps.</p>
+          </div>
         </div>
         <div class="report-grid">
-          <article><strong>Bug Report</strong><span>Root cause + reproduction + fix + verification</span></article>
-          <article><strong>Website Audit</strong><span>UX + performance + SEO + security findings</span></article>
-          <article><strong>Architecture Review</strong><span>Risks + scalability + maintainability + roadmap</span></article>
-          <article><strong>Release Readiness</strong><span>Pre-production checklist and blocking issues</span></article>
+          <article><span class="report-index">01</span><strong>Bug Report</strong><span>Root cause + reproduction + fix + verification</span></article>
+          <article><span class="report-index">02</span><strong>Website Audit</strong><span>UX + performance + SEO + security findings</span></article>
+          <article><span class="report-index">03</span><strong>Architecture Review</strong><span>Risks + scalability + maintainability + roadmap</span></article>
+          <article><span class="report-index">04</span><strong>Release Readiness</strong><span>Pre-production checklist and blocking issues</span></article>
         </div>
       </section>
 
       <section class="view" id="view-plans">
-        <div class="section-heading">
-          <span class="eyebrow">MONTHLY SUBSCRIPTIONS</span>
-          <h2>اختر مستوى Hana AI Pro</h2>
-          <p>الأسعار الحالية معدّة للاختبار عبر Stripe Test Mode حتى اكتمال التحقق التجاري.</p>
+        <div class="section-heading identity-heading">
+          <img src="/assets/garhy-mark.webp" alt="GARHY TECH" width="56" height="56" />
+          <div>
+            <span class="eyebrow">MONTHLY SUBSCRIPTIONS</span>
+            <h2>اختر مستوى Hana AI Pro</h2>
+            <p>الأسعار الحالية تعمل عبر Stripe Test Mode حتى اكتمال التحقق التجاري وقبل أي انتقال إلى Live Billing.</p>
+          </div>
         </div>
 
         <div class="pricing-grid">
@@ -152,6 +202,7 @@
             <a class="primary link-button" href="https://buy.stripe.com/test_28E14nb5Hfi65Ev0LQ5wI00" target="_blank" rel="noopener">اختبار الاشتراك</a>
           </article>
           <article class="price-card featured">
+            <div class="popular">MOST POPULAR</div>
             <span class="eyebrow">PRO</span><h3>$150 <small>/ شهر</small></h3>
             <p>للمطورين المحترفين والتحليل الأعمق.</p>
             <ul><li>Everything in Starter</li><li>Advanced code review</li><li>Website/store inspection</li><li>Priority reports</li></ul>
@@ -171,6 +222,11 @@
           </article>
         </div>
       </section>
+
+      <footer class="product-footer">
+        <span>HANA AI PRO · GARHY TECH</span>
+        <span>IDEAS · SOLUTIONS · GROWTH</span>
+      </footer>
     </main>
   </div>
 

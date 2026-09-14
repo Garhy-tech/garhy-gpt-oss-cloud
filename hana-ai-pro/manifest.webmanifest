@@ -1,0 +1,12 @@
+{
+  "name": "Hana AI Pro — GARHY TECH",
+  "short_name": "Hana AI",
+  "description": "Professional AI workspace by GARHY TECH.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030811",
+  "theme_color": "#050b14",
+  "icons": [
+    {"src":"/assets/garhy-mark.webp","sizes":"512x512","type":"image/webp"}
+  ]
+}
