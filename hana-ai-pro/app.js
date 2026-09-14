@@ -42,3 +42,5 @@ document.getElementById('auditForm').addEventListener('submit',async event=>{
 
 document.getElementById('accountButton').addEventListener('click',()=>showToast('سيتم ربط GARHY ID قبل Production cutover.'));
 document.getElementById('languageButton').addEventListener('click',()=>showToast('English workspace localization is prepared for the next release.'));
+
+// Deployment marker: Root Directory is hana-ai-pro.
