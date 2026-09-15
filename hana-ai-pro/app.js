@@ -1,6 +1,19 @@
-import { HANA_IMAGE_SRC } from './hana-image.js';
+const HANA_PRIMARY='/assets/identity/hana-primary.webp';
+const HANA_GALLERY='/assets/identity/hana-gallery.webp';
 
-document.querySelectorAll('[data-hana]').forEach(img=>{img.src=HANA_IMAGE_SRC});
+document.querySelectorAll('[data-hana]').forEach(img=>{img.src=HANA_PRIMARY});
+
+const hero=document.querySelector('.hero-card');
+if(hero){
+  const gallery=document.createElement('section');
+  gallery.className='identity-gallery';
+  gallery.setAttribute('aria-label','GARHY TECH approved identity collection');
+  gallery.innerHTML=`<div class="identity-gallery-copy"><span class="eyebrow">OFFICIAL IDENTITY COLLECTION</span><strong>هوية GARHY TECH المعتمدة</strong></div><img src="${HANA_GALLERY}" alt="GARHY TECH approved identity avatar collection" width="510" height="207" loading="lazy" decoding="async">`;
+  hero.insertAdjacentElement('afterend',gallery);
+  const style=document.createElement('style');
+  style.textContent='.identity-gallery{display:grid;grid-template-columns:minmax(180px,.42fr) minmax(0,1fr);align-items:center;gap:18px;margin:-2px 0 18px;padding:14px 16px;border:1px solid rgba(36,103,158,.32);border-radius:16px;background:linear-gradient(145deg,rgba(7,20,33,.9),rgba(3,11,20,.9));overflow:hidden}.identity-gallery-copy{display:grid;gap:6px}.identity-gallery-copy strong{font-size:14px}.identity-gallery img{display:block;width:100%;height:auto;max-height:207px;object-fit:contain;border-radius:12px;border:1px solid rgba(49,132,198,.24)}@media(max-width:820px){.identity-gallery{grid-template-columns:1fr}.identity-gallery-copy{text-align:center}.identity-gallery img{margin:auto}}';
+  document.head.append(style);
+}
 
 const views=[...document.querySelectorAll('.view')];
 const nav=[...document.querySelectorAll('[data-view]')];
@@ -18,7 +31,7 @@ document.querySelectorAll('#quickGrid button').forEach(button=>button.addEventLi
 function createAvatar(role){
   if(role==='assistant'){
     const img=document.createElement('img');
-    img.className='avatar assistant-avatar';img.src=HANA_IMAGE_SRC;img.alt='Hana';img.width=38;img.height=38;return img;
+    img.className='avatar assistant-avatar';img.src=HANA_PRIMARY;img.alt='Hana';img.width=38;img.height=38;return img;
   }
   const user=document.createElement('div');user.className='avatar user-avatar';user.textContent='U';user.setAttribute('aria-hidden','true');return user;
 }
@@ -52,5 +65,5 @@ document.getElementById('auditForm').addEventListener('submit',event=>{
   showToast('Audit target prepared — no scan executed.');
 });
 
-document.getElementById('accountButton').addEventListener('click',()=>showToast('GARHY ID integration remains staged before public domain cutover.'));
+document.getElementById('accountButton').addEventListener('click',()=>showToast('GARHY ID integration remains staged.'));
 document.getElementById('languageButton').addEventListener('click',()=>showToast('English localization is staged for the next release.'));
