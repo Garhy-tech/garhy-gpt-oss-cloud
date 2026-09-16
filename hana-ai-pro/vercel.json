@@ -2,6 +2,18 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "alias": ["garhy.ai"],
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/catalog",
+      "destination": "https://store.garhy.tech/catalog",
+      "permanent": true
+    },
+    {
+      "source": "/catalog/:path*",
+      "destination": "https://store.garhy.tech/catalog/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
