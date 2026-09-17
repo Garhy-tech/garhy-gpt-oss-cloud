@@ -1,12 +1,19 @@
 {
-  "name": "Hana AI Pro — GARHY TECH",
+  "name": "Hana AI Pro",
   "short_name": "Hana AI",
-  "description": "Professional AI workspace by GARHY TECH.",
+  "description": "Professional Engineering AI Workspace by GARHY TECH.",
+  "brand": "GARHY TECH",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#030811",
-  "theme_color": "#050b14",
+  "theme_color": "#06111f",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["productivity", "developer-tools"],
   "icons": [
-    {"src":"/assets/garhy-mark.webp","sizes":"512x512","type":"image/webp"}
+    {"src":"/assets/brand/icon-maskable.webp","sizes":"512x512","type":"image/webp","purpose":"any"},
+    {"src":"/assets/brand/icon-maskable.webp","sizes":"512x512","type":"image/webp","purpose":"maskable"}
   ]
 }
