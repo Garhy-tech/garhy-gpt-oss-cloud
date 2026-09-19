@@ -54,6 +54,29 @@ function withinStep(value, step) {
   if (!step || Number(step) === 0) return true;
   const [a,b] = compareDecimal(value,step); return a % b === 0n;
 }
+function publicIdentity(result = {}) {
+  const uid = result.userIDInt64 && result.userIDInt64 !== '0' ? result.userIDInt64 : result.userID;
+  const inviterUid = result.inviterIDInt64 && result.inviterIDInt64 !== '0' ? result.inviterIDInt64 : result.inviterID;
+  const affiliateId = result.affiliateIDInt64 && result.affiliateIDInt64 !== '0' ? result.affiliateIDInt64 : result.affiliateID;
+  return {
+    uid: uid === undefined || uid === null ? null : String(uid),
+    kycLevel: result.kycLevel || null,
+    kycRegion: result.kycRegion || null,
+    isMaster: typeof result.isMaster === 'boolean' ? result.isMaster : null,
+    parentUid: result.parentUid === undefined || result.parentUid === null ? null : String(result.parentUid),
+    vipLevel: result.vipLevel || null,
+    marketMakerLevel: result.mktMakerLevel || null,
+    inviterUid: inviterUid === undefined || inviterUid === null ? null : String(inviterUid),
+    affiliateId: affiliateId === undefined || affiliateId === null ? null : String(affiliateId),
+    unifiedAccount: result.uta === 1,
+    apiReadOnly: result.readOnly === 1,
+    apiCreatedAt: result.createdAt || null,
+    apiExpiresAt: result.expiredAt || null,
+    apiDeadlineDays: Number.isFinite(Number(result.deadlineDay)) ? Number(result.deadlineDay) : null,
+    fixApiEnabled: typeof result.isFixApi === 'boolean' ? result.isFixApi : null,
+  };
+}
+
 async function checkInstrument(request, action, data) {
   if (!['place-order','set-leverage'].includes(action)) return;
   const result = await request('GET','/v5/market/instruments-info',{category:data.category,symbol:data.symbol});
@@ -88,7 +111,8 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     if (action === 'session') return send(res,200,session ? {ok:true,authenticated:true,csrfToken:session.csrf,expiresAt:session.expiresAt,absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false} : {ok:true,authenticated:false});
     await sessions.rateLimit(`read:${session.owner}`,120);
     let path, params = {};
-    if (action === 'account' || action === 'status') path = '/v5/account/info';
+    if (action === 'identity') path = '/v5/user/query-api';
+    else if (action === 'account' || action === 'status') path = '/v5/account/info';
     else if (action === 'wallet') { path='/v5/account/wallet-balance'; params.accountType=enumValue(q.accountType || 'UNIFIED',['UNIFIED','CONTRACT','SPOT'],'الحساب'); if(q.coin) params.coin=coin(q.coin); }
     else if (['positions','orders','order-history','executions'].includes(action)) {
       params.category=enumValue(q.category || (action === 'positions' ? 'linear' : 'spot'),action === 'positions' ? ['linear','inverse'] : categories,'السوق');
@@ -112,6 +136,7 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     else if(action === 'convert-status') { path='/v5/asset/exchange/convert-result-query'; params.quoteTxId=text(q.quoteTxId,'quoteTxId',120); }
     else throw new AppError('UNKNOWN_ACTION','العملية غير مدعومة.',404);
     const result = await request('GET',path,params);
+    if (action === 'identity') return send(res,200,{ok:true,data:publicIdentity(result.result)});
     return send(res,200,{ok:true,data:result.result,hasMore:Boolean(result.result.nextPageCursor)});
   }
   async function post(req,res) {
