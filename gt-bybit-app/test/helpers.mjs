@@ -16,6 +16,7 @@ export function mockRequest(calls=[],now=Date.now) {
     let result={};
     if(path==='/v5/market/instruments-info')result={list:[{symbol:payload.symbol,status:'Trading',lotSizeFilter:{minOrderQty:'0.001',maxOrderQty:'100',qtyStep:'0.001'},priceFilter:{minPrice:'1',maxPrice:'1000000',tickSize:'0.1'},leverageFilter:{minLeverage:'1',maxLeverage:'100',leverageStep:'0.1'}}]};
     else if(path==='/v5/account/info')result={unifiedMarginStatus:5,marginMode:'REGULAR_MARGIN'};
+    else if(path==='/v5/user/query-api')result={userID:'123456789',userIDInt64:'123456789',kycLevel:'LEVEL_2',kycRegion:'OM',isMaster:true,parentUid:'0',vipLevel:'VIP-1',mktMakerLevel:'0',inviterID:'987654',affiliateID:'AFF-1',uta:1,readOnly:1,createdAt:'1700000000000',expiredAt:'0',deadlineDay:90,isFixApi:false,apiKey:'SECRET-KEY',ips:['1.2.3.4'],permissions:{ContractTrade:['Order']},rsaPublicKey:'SECRET-RSA'};
     else if(path==='/v5/account/wallet-balance')result={list:[{accountType:'UNIFIED',totalEquity:'12345.67',totalWalletBalance:'12000.25',coin:[{coin:'USDT',walletBalance:'10000.125',usdValue:'10000.125',unrealisedPnl:'345.42'}]}]};
     else if(path==='/v5/position/list')result={list:[{symbol:'BTCUSDT',side:'Buy',size:'0.01',avgPrice:'65000',markPrice:'65500',leverage:'5',unrealisedPnl:'5',liqPrice:'52000'}]};
     else if(path==='/v5/order/realtime')result={list:[{symbol:'BTCUSDT',side:'Buy',orderType:'Limit',qty:'0.001',price:'60000',orderStatus:'New',orderId:'qa-order-001'}]};
