@@ -100,9 +100,24 @@ test('quotes expire, bind to their session and execute at most once even with ne
 });
 test('read-only account routes work through mocks without any upstream writes',async()=>{
   const s=await setup();
-  for(const action of ['health','session','status','account','wallet','positions','orders','order-history','executions','assets','transfer-coins','transfer-account-types','convert-coins','transfers','convert-history'])assert.equal((await invoke(s.handler,{query:{action},cookie:s.cookie})).statusCode,200,action);
+  for(const action of ['health','session','status','account','identity','wallet','positions','orders','order-history','executions','assets','transfer-coins','transfer-account-types','convert-coins','transfers','convert-history'])assert.equal((await invoke(s.handler,{query:{action},cookie:s.cookie})).statusCode,200,action);
   assert.equal(s.calls.filter((c)=>c.method==='POST').length,0);
 });
+test('identity route exposes only sanitized account metadata',async()=>{
+  const s=await setup();
+  const res=await invoke(s.handler,{query:{action:'identity'},cookie:s.cookie});
+  assert.equal(res.statusCode,200);
+  assert.deepEqual(res.body.data,{
+    uid:'123456789',kycLevel:'LEVEL_2',kycRegion:'OM',isMaster:true,parentUid:'0',vipLevel:'VIP-1',marketMakerLevel:'0',
+    inviterUid:'987654',affiliateId:'AFF-1',unifiedAccount:true,apiReadOnly:true,apiCreatedAt:'1700000000000',
+    apiExpiresAt:'0',apiDeadlineDays:90,fixApiEnabled:false,
+  });
+  const json=JSON.stringify(res.body);
+  for(const forbidden of ['SECRET-KEY','1.2.3.4','permissions','SECRET-RSA'])assert.ok(!json.includes(forbidden));
+  assert.equal(s.calls.at(-1).path,'/v5/user/query-api');
+  assert.equal(s.calls.at(-1).method,'GET');
+});
+
 test('Bybit signs exact transmitted bytes, omits GET body, and does not follow redirects',async()=>{
   const env=fixtureEnv(),time=1720071077014;let seen=0;
   const client=createBybitClient({env,now:()=>time,fetchImpl:async(url,options)=>{
