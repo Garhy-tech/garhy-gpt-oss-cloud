@@ -100,7 +100,7 @@ function lockLocal() {
   $('controlToken').value='';
   if($('confirmDialog').open) $('confirmDialog').close('cancel');
   for(const id of ['walletTable','positionsTable','ordersTable','availableAssets']) $(id).textContent='افتح الجلسة لعرض البيانات.';
-  for(const id of ['mEquity','mWallet','mPositions','mOrders']) $(id).textContent='—';
+  for(const id of ['mEquity','mWallet','mPositions','mOrders','identityUid','identityKyc','identityRegion','identityMaster','identityParent','identityVip','identityUnified','identityReadOnly']) $(id).textContent='—';
   $$('form').forEach((form)=>form.reset());setUnlocked(false);setStatus('idle','مقفلة');$('pageTitle').textContent='GT.BYBIT';
 }
 function navigate(view) {
@@ -209,6 +209,18 @@ function renderPositions(payload) {
   $('positionsTable').innerHTML = `<table><thead><tr><th>السوق</th><th>الجهة</th><th>الكمية</th><th>المتوسط</th><th>السعر المرجعي</th><th>الرافعة</th><th>الربح</th><th>التصفية</th></tr></thead><tbody>${list.map((p) => `<tr><td class="coin">${escapeHtml(p.symbol)}</td><td class="${p.side === 'Buy' ? 'side-buy' : 'side-sell'}">${escapeHtml(p.side)}</td><td>${escapeHtml(p.size)}</td><td>${escapeHtml(p.avgPrice)}</td><td>${escapeHtml(p.markPrice)}</td><td>${escapeHtml(p.leverage)}x</td><td class="${pnlClass(p.unrealisedPnl)}">${escapeHtml(formatNumber(p.unrealisedPnl, 4))}</td><td>${escapeHtml(p.liqPrice || '—')}</td></tr>`).join('')}</tbody></table>`;
 }
 
+function renderIdentity(payload) {
+  const data=payload?.data || {};
+  $('identityUid').textContent=data.uid || '—';
+  $('identityKyc').textContent=data.kycLevel || '—';
+  $('identityRegion').textContent=data.kycRegion || '—';
+  $('identityMaster').textContent=data.isMaster===true?'Master':data.isMaster===false?'Sub-account':'—';
+  $('identityParent').textContent=data.parentUid && data.parentUid!=='0'?data.parentUid:'—';
+  $('identityVip').textContent=data.vipLevel || '—';
+  $('identityUnified').textContent=data.unifiedAccount===true?'نعم':data.unifiedAccount===false?'لا':'—';
+  $('identityReadOnly').textContent=data.apiReadOnly===true?'نعم':data.apiReadOnly===false?'لا':'—';
+}
+
 function renderOrders(payload, category) {
   const list = payload?.data?.list || [];
   $('mOrders').textContent = `${list.length}${payload.hasMore ? '+' : ''}`;
@@ -239,7 +251,7 @@ async function refreshDashboard(showToast=true) {
   state.refreshing=true;$('refreshBtn').disabled=true;
   const epoch=state.generation;
   try {
-    const jobs=[['walletTable',()=>apiGet('wallet'),renderWallet],['positionsTable',()=>apiGet('positions',{category:'linear',settleCoin:'USDT'}),renderPositions],['ordersTable',loadOrders,null],['settingsAccount',()=>apiGet('account'),(result)=>{const mode=result.data.unifiedMarginStatus;$('settingsAccount').textContent=({1:'Classic',3:'UTA 1.0',4:'UTA 1.0 Pro',5:'UTA 2.0',6:'UTA 2.0 Pro'})[mode] || 'غير محدد';}]];
+    const jobs=[['walletTable',()=>apiGet('wallet'),renderWallet],['positionsTable',()=>apiGet('positions',{category:'linear',settleCoin:'USDT'}),renderPositions],['ordersTable',loadOrders,null],['settingsAccount',()=>apiGet('account'),(result)=>{const mode=result.data.unifiedMarginStatus;$('settingsAccount').textContent=({1:'Classic',3:'UTA 1.0',4:'UTA 1.0 Pro',5:'UTA 2.0',6:'UTA 2.0 Pro'})[mode] || 'غير محدد';}],['identityUid',()=>apiGet('identity'),renderIdentity]];
     const results=await Promise.allSettled(jobs.map(async([id,fetcher,render])=>{try {const result=await fetcher();if(epoch===state.generation && state.authenticated && render)render(result);}catch(error){if(epoch===state.generation && state.authenticated)$(id).textContent=error.message;throw error;}}));
     if(epoch!==state.generation || !state.authenticated)return;
     const rejected=results.filter((r)=>r.status==='rejected');
