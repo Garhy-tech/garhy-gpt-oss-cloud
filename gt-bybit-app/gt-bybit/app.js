@@ -3,7 +3,7 @@ import { validateAction, financialActions } from './validation.js?v=20260908-2';
 const API='/api/bybit';
 const VIEW_TITLES={overview:'الرئيسية',trade:'التداول',risk:'إدارة المخاطر',assets:'الأصول والتحويلات',settings:'الإعدادات والأمان'};
 const $=(id)=>document.getElementById(id);
-const $=(selector)=>[...document.querySelectorAll(selector)];
+const $$=(selector)=>[...document.querySelectorAll(selector)];
 const locale=()=>window.GTPreferences?.locale?.() || 'ar-EG';
 const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false,accountSnapshot:null,session:null};
 const NOTIFICATION_PREF='gt-bybit-notifications';
