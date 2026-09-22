@@ -3,8 +3,9 @@ import { validateAction, financialActions } from './validation.js?v=20260908-2';
 const API='/api/bybit';
 const VIEW_TITLES={overview:'الرئيسية',trade:'التداول',risk:'إدارة المخاطر',assets:'الأصول والتحويلات',settings:'الإعدادات والأمان'};
 const $=(id)=>document.getElementById(id);
-const $$=(selector)=>[...document.querySelectorAll(selector)];
-const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false,accountSnapshot:null};
+const $=(selector)=>[...document.querySelectorAll(selector)];
+const locale=()=>window.GTPreferences?.locale?.() || 'ar-EG';
+const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false,accountSnapshot:null,session:null};
 const NOTIFICATION_PREF='gt-bybit-notifications';
 const NOTIFICATION_ON='enabled';
 const NOTIFICATION_OFF='disabled';
@@ -39,7 +40,7 @@ function updateNotificationState(){
 async function notify(title,body,tag){
   if(!notificationsEnabled())return;
   const registration=await navigator.serviceWorker?.ready.catch(()=>null);
-  if(registration)await registration.showNotification(title,{body,tag,icon:'/assets/gt-bybit/icon-192.png',badge:'/assets/gt-bybit/icon-192.png',dir:'rtl',lang:'ar',renotify:false,data:{url:'/'}});
+  if(registration)await registration.showNotification(title,{body,tag,icon:'/assets/gt-bybit/icon-192.png',badge:'/assets/gt-bybit/icon-192.png',dir:window.GTPreferences?.dir?.() || 'rtl',lang:window.GTPreferences?.language?.() || 'ar',renotify:false,data:{url:'/'}});
 }
 async function toggleNotifications(){
   if(notificationsEnabled()){
@@ -96,7 +97,7 @@ function setUnlocked(unlocked) {
 }
 function clearQuote() { state.quote=null; clearTimeout(state.quoteTimer); $('confirmConvertBtn').hidden=true; $('confirmConvertBtn').classList.add('hidden'); $('convertQuote').textContent='اطلب عرض سعر جديدًا قبل التحويل.'; }
 function lockLocal() {
-  state.generation++;state.csrf='';state.attempts.clear();clearQuote();
+  state.generation++;state.session=null;state.csrf='';state.attempts.clear();clearQuote();
   $('controlToken').value='';
   if($('confirmDialog').open) $('confirmDialog').close('cancel');
   for(const id of ['walletTable','positionsTable','ordersTable','availableAssets']) $(id).textContent='افتح الجلسة لعرض البيانات.';
@@ -114,10 +115,10 @@ function navigate(view) {
   if(state.authenticated && target==='assets') loadAssets().catch((e)=>toast(e.message,'error'));
 }
 async function applySession(session) {
-  state.csrf=session.csrfToken;setUnlocked(true);
+  state.session=session;state.csrf=session.csrfToken;setUnlocked(true);
   $('sessionClock').textContent='مفتوحة';
   $('sessionPolicy').textContent=`لا قفل بسبب الخمول. الصلاحية القصوى ${session.absoluteLifetimeDays} يومًا من تسجيل الدخول، أو حتى تسجيل الخروج أو إلغاء الجلسة.`;
-  $('sessionExpiry').textContent=new Intl.DateTimeFormat('ar-EG',{dateStyle:'medium',timeStyle:'short'}).format(new Date(session.expiresAt));
+  $('sessionExpiry').textContent=new Intl.DateTimeFormat(locale(),{dateStyle:'medium',timeStyle:'short'}).format(new Date(session.expiresAt));
   setStatus('ok','جلسة مفتوحة');navigate(new URL(location.href).searchParams.get('view') || 'overview');
   await refreshDashboard(false);
 }
@@ -149,7 +150,7 @@ function confirmAction(data) {
   for(const [key,value] of entries) {
     const row=document.createElement('div'),term=document.createElement('dt'),detail=document.createElement('dd');
     term.textContent=SUMMARY_LABELS[key] || key;
-    detail.textContent=key==='action' ? ACTION_LABELS[value] : key==='expiredTime' ? new Date(Number(value)).toLocaleTimeString('ar-EG') : String(value);
+    detail.textContent=key==='action' ? ACTION_LABELS[value] : key==='expiredTime' ? new Date(Number(value)).toLocaleTimeString(locale()) : String(value);
     row.append(term,detail);$('confirmationSummary').append(row);
   }
   $('confirmationTyped').value='';$('typedConfirmField').hidden=data.action!=='cancel-all';
@@ -287,7 +288,7 @@ $('convertForm').addEventListener('submit',async(event)=>{
     const result=await api('convert-quote',{body:data});state.quote=result.data;
     const q=state.quote;
     if(!q.quoteTxId || Number(q.expiredTime)<=Date.now())throw new Error('عرض التحويل منتهي أو غير صالح.');
-    $('convertQuote').textContent=`${q.fromAmount} ${q.fromCoin} ← ${q.toAmount} ${q.toCoin} · سعر التحويل ${q.exchangeRate} · ينتهي ${new Date(Number(q.expiredTime)).toLocaleTimeString('ar-EG')}`;
+    $('convertQuote').textContent=`${q.fromAmount} ${q.fromCoin} ← ${q.toAmount} ${q.toCoin} · سعر التحويل ${q.exchangeRate} · ينتهي ${new Date(Number(q.expiredTime)).toLocaleTimeString(locale())}`;
     $('confirmConvertBtn').hidden=false;$('confirmConvertBtn').classList.remove('hidden');
     state.quoteTimer=setTimeout(()=>{clearQuote();$('convertQuote').textContent='انتهت صلاحية العرض. اطلب عرضًا جديدًا.';},Math.max(0,Number(q.expiredTime)-Date.now()));
   }catch(error){clearQuote();toast(error.message,'error');}
@@ -306,6 +307,10 @@ $('installBtn').addEventListener('click',installApp);$('installSettingsBtn').add
 $('notificationBtn').addEventListener('click',toggleNotifications);
 window.addEventListener('storage',(event)=>{if(event.key===NOTIFICATION_PREF)updateNotificationState();});
 window.addEventListener('focus',updateNotificationState);
+window.addEventListener('gtpreferenceschange',()=>{
+  if(state.session?.expiresAt)$('sessionExpiry').textContent=new Intl.DateTimeFormat(locale(),{dateStyle:'medium',timeStyle:'short'}).format(new Date(state.session.expiresAt));
+  updateNotificationState();
+});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateNotificationState();});
 function updateConnectivity(){
   const offline=!navigator.onLine;$('offlineBanner').hidden=!offline;$('offlineBanner').classList.toggle('hidden',!offline);
