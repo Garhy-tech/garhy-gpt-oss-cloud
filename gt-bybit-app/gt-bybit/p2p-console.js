@@ -7,6 +7,7 @@ let knownPendingIds = new Set();
 let initializedPendingSnapshot = false;
 
 const $ = (id) => document.getElementById(id);
+const locale = () => window.GTPreferences?.locale?.() || 'ar-EG';
 
 function toast(message, kind = 'info') {
   const el = $('toast');
@@ -76,7 +77,7 @@ function formatTime(value) {
   const n = Number(value);
   if (!Number.isFinite(n) || n <= 0) return String(value || '—');
   const ms = n < 1e12 ? n * 1000 : n;
-  try { return new Date(ms).toLocaleString('ar-EG'); } catch { return String(value); }
+  try { return new Date(ms).toLocaleString(locale()); } catch { return String(value); }
 }
 
 function renderPending(payload) {
@@ -197,7 +198,7 @@ async function refreshAll(showToast = false) {
   try {
     await checkStatus();
     await Promise.all([refreshPending(false), refreshAds(false)]);
-    $('mSync').textContent = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    $('mSync').textContent = new Date().toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
     if (showToast) toast('تمت مزامنة P2P بنجاح.', 'success');
   } catch (error) {
     $('mPending').textContent = '—';
