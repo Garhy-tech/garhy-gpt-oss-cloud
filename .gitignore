@@ -1,0 +1,34 @@
+# Dependencies and generated output
+node_modules/
+.next/
+.turbo/
+.cache/
+dist/
+build/
+coverage/
+
+# Local environment and deployment state
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.backup
+
+# OS and editor metadata
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Sensitive local key/certificate material
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
