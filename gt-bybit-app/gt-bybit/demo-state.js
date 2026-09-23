@@ -12,7 +12,7 @@ export function formatDemoAccountBalance() {
 
 export function isDemoFinancialMode(env = {}) {
   const vercelEnv=String(env.VERCEL_ENV || '').toLowerCase();
-  if(vercelEnv === 'production') return String(env.GT_FINANCIAL_DATA_MODE || '').toLowerCase() !== 'live';
+  if(vercelEnv === 'production') return false;
   if(vercelEnv === 'preview' || vercelEnv === 'development') return true;
   const appMode=String(env.GT_APP_MODE || env.GT_FINANCIAL_DATA_MODE || '').toLowerCase();
   if(DEMO_APP_MODES.has(appMode)) return true;

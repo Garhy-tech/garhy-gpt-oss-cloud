@@ -1,5 +1,5 @@
 import { validateAction, financialActions } from './validation.js?v=20260908-2';
-import { formatDemoAccountBalance } from './demo-state.js?v=20260923-presentation1';
+import { formatDemoAccountBalance } from './demo-state.js?v=20260924-live1';
 
 const API='/api/bybit';
 const VIEW_TITLES={overview:'الرئيسية',trade:'التداول',risk:'إدارة المخاطر',assets:'الأصول والتحويلات',settings:'الإعدادات والأمان'};

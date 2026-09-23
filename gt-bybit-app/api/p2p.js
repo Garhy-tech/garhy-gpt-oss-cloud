@@ -6,7 +6,7 @@ import { isDemoFinancialMode } from '../gt-bybit/demo-state.js';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FROZEN_MESSAGE='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
-function accountFrozen(){return process.env.GT_ACCOUNT_FROZEN==='true' || process.env.VERCEL_ENV==='production';}
+function accountFrozen(){return process.env.GT_ACCOUNT_FROZEN==='true';}
 const SAFE_AD_PAYLOAD_KEYS = new Set([
   'tokenId', 'currencyId', 'side', 'priceType', 'premium', 'price', 'minAmount', 'maxAmount',
   'remark', 'tradingPreferenceSet', 'paymentIds', 'quantity', 'paymentPeriod', 'itemId', 'actionType',
