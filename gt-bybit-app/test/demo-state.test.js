@@ -8,7 +8,7 @@ test('demo balance has one centralized source of truth and stable formatting',()
 });
 
 test('demo financial mode is never inferred for production and is explicit elsewhere',()=>{
-  assert.equal(isDemoFinancialMode({VERCEL_ENV:'production'}),true);
+  assert.equal(isDemoFinancialMode({VERCEL_ENV:'production'}),false);
   assert.equal(isDemoFinancialMode({VERCEL_ENV:'production',GT_FINANCIAL_DATA_MODE:'live'}),false);
   assert.equal(isDemoFinancialMode({VERCEL_ENV:'preview'}),true);
   assert.equal(isDemoFinancialMode({VERCEL_ENV:'development'}),true);
