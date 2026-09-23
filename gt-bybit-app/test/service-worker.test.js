@@ -20,3 +20,8 @@ test('service worker ignores every API, money, cross-origin, authorization and u
 test('service worker purges only old GT.BYBIT caches and claims clients',async()=>{
   const w=worker();let pending;w.handlers.activate({waitUntil(promise){pending=promise;}});await pending;assert.deepEqual(w.deleted,['gt-bybit-shell-v3','gt-bybit-shell-20260908-2','gt-bybit-shell-20260910-3','gt-bybit-shell-20260910-4','gt-bybit-shell-20260910-5','gt-bybit-shell-20260910-6','gt-bybit-shell-20260910-7','gt-bybit-shell-20260910-8','gt-bybit-shell-20260910-9','gt-bybit-shell-20260910-10']);assert.equal(w.claimed,true);
 });
+
+test('service worker caches preference runtime dependencies',()=>{
+  assert.match(source,/preferences-bootstrap\.js/);
+  assert.match(source,/preferences\.js/);
+});
