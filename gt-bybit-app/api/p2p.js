@@ -7,6 +7,9 @@ import { isDemoFinancialMode } from '../gt-bybit/demo-state.js';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FROZEN_MESSAGE='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
 function accountFrozen(){return process.env.GT_ACCOUNT_FROZEN==='true';}
+function mutationsEnabled(){
+  return !accountFrozen() && (process.env.VERCEL_ENV==='production' || process.env.BYBIT_ENABLE_MUTATIONS==='true');
+}
 const SAFE_AD_PAYLOAD_KEYS = new Set([
   'tokenId', 'currencyId', 'side', 'priceType', 'premium', 'price', 'minAmount', 'maxAmount',
   'remark', 'tradingPreferenceSet', 'paymentIds', 'quantity', 'paymentPeriod', 'itemId', 'actionType',
@@ -108,7 +111,7 @@ function adId(ad = {}) {
 function requireMutationReview(body, expectedConfirm) {
   if (accountFrozen()) fail(423, 'ACCOUNT_FROZEN', FROZEN_MESSAGE);
   if (isDemoFinancialMode(process.env)) fail(403, 'PRESENTATION_MODE_MUTATION_BLOCKED', 'Fixed presentation never executes real P2P financial operations');
-  if (process.env.BYBIT_ENABLE_MUTATIONS !== 'true') fail(403, 'MUTATIONS_DISABLED', 'P2P mutations are disabled by server configuration');
+  if (!mutationsEnabled()) fail(403, 'MUTATIONS_DISABLED', 'P2P mutations are disabled by server configuration');
   if (body.confirm !== expectedConfirm) fail(400, 'CONFIRMATION_REQUIRED', `action requires confirm=${expectedConfirm}`);
   if (body.confirmed !== true) fail(400, 'CONFIRMATION_REQUIRED', 'Explicit reviewed confirmation is required');
   const requestId=text(body.requestId, 'requestId', 64);
