@@ -106,8 +106,8 @@ function adId(ad = {}) {
 }
 
 function requireMutationReview(body, expectedConfirm) {
-  if (isDemoFinancialMode(process.env)) fail(403, 'DEMO_MODE_MUTATION_BLOCKED', 'Demo mode never executes real P2P financial operations');
   if (accountFrozen()) fail(423, 'ACCOUNT_FROZEN', FROZEN_MESSAGE);
+  if (isDemoFinancialMode(process.env)) fail(403, 'PRESENTATION_MODE_MUTATION_BLOCKED', 'Fixed presentation never executes real P2P financial operations');
   if (process.env.BYBIT_ENABLE_MUTATIONS !== 'true') fail(403, 'MUTATIONS_DISABLED', 'P2P mutations are disabled by server configuration');
   if (body.confirm !== expectedConfirm) fail(400, 'CONFIRMATION_REQUIRED', `action requires confirm=${expectedConfirm}`);
   if (body.confirmed !== true) fail(400, 'CONFIRMATION_REQUIRED', 'Explicit reviewed confirmation is required');
@@ -137,12 +137,12 @@ async function handle(req, res) {
         service: 'bybit-p2p-v5',
         data: {},
         accountFrozen: false,
-        financialDataMode: 'demo',
+        financialDataMode: 'presentation',
         frozenMessage: null,
         timestamp: Date.now(),
       });
     }
-    fail(403, 'DEMO_MODE_LIVE_DATA_BLOCKED', 'Demo mode does not read or mutate live P2P financial data');
+    fail(403, 'PRESENTATION_MODE_LIVE_DATA_BLOCKED', 'Fixed presentation does not read or mutate live P2P financial data');
   }
 
   if (action === 'status' || action === 'user-info') {

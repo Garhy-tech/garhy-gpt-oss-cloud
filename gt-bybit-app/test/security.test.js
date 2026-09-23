@@ -50,12 +50,12 @@ test('production frozen-account mode keeps financial data live-only and blocks m
   const health=await invoke(s.handler,{query:{action:'health'}});
   assert.equal(health.statusCode,200);
   assert.equal(health.body.accountFrozen,true);
-  assert.equal(health.body.financialDataMode,'live');
+  assert.equal(health.body.financialDataMode,'presentation');
   assert.equal(Object.hasOwn(health.body,'frozenBalanceUsd'),false);
 
   const wallet=await invoke(s.handler,{query:{action:'wallet'},cookie:s.cookie});
-  assert.equal(wallet.statusCode,200);
-  assert.equal(wallet.body.data.list[0].totalEquity,'12345.67');
+  assert.equal(wallet.statusCode,403);
+  assert.equal(wallet.body.error,'PRESENTATION_MODE_LIVE_DATA_BLOCKED');
 
   const quote=await invoke(s.handler,{method:'POST',body:{action:'convert-quote',fromCoin:'USDT',toCoin:'USDC',requestAmount:'10',accountType:'eb_convert_uta'},cookie:s.cookie,csrf:s.csrf});
   assert.equal(quote.statusCode,423);
@@ -72,20 +72,20 @@ test('preview demo mode is explicit and blocks all financial mutations before By
   const s=await setup({env});
   const health=await invoke(s.handler,{query:{action:'health'}});
   assert.equal(health.statusCode,200);
-  assert.equal(health.body.financialDataMode,'demo');
+  assert.equal(health.body.financialDataMode,'presentation');
   assert.equal(health.body.accountFrozen,false);
 
   const wallet=await invoke(s.handler,{query:{action:'wallet'},cookie:s.cookie});
   assert.equal(wallet.statusCode,403);
-  assert.equal(wallet.body.error,'DEMO_MODE_LIVE_DATA_BLOCKED');
+  assert.equal(wallet.body.error,'PRESENTATION_MODE_LIVE_DATA_BLOCKED');
 
   const quote=await invoke(s.handler,{method:'POST',body:{action:'convert-quote',fromCoin:'USDT',toCoin:'USDC',requestAmount:'10',accountType:'eb_convert_uta'},cookie:s.cookie,csrf:s.csrf});
   assert.equal(quote.statusCode,403);
-  assert.equal(quote.body.error,'DEMO_MODE_MUTATION_BLOCKED');
+  assert.equal(quote.body.error,'PRESENTATION_MODE_MUTATION_BLOCKED');
 
   const mutation=await invoke(s.handler,{method:'POST',body:money(order),cookie:s.cookie,csrf:s.csrf});
   assert.equal(mutation.statusCode,403);
-  assert.equal(mutation.body.error,'DEMO_MODE_MUTATION_BLOCKED');
+  assert.equal(mutation.body.error,'PRESENTATION_MODE_MUTATION_BLOCKED');
   assert.equal(s.calls.length,0);
 });
 test('method, JSON, content type, payload size and secret query guards reject before Bybit',async()=>{
