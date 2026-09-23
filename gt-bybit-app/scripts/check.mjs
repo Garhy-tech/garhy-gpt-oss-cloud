@@ -7,6 +7,8 @@ for(const directory of ['api','lib','gt-bybit','scripts'])for(const name of awai
 const config=JSON.parse(await readFile(new URL('vercel.json',root),'utf8'));
 const manifest=JSON.parse(await readFile(new URL('gt-bybit/manifest.webmanifest',root),'utf8'));
 const html=await readFile(new URL('gt-bybit/index.html',root),'utf8');
+const p2pHtml=await readFile(new URL('gt-bybit/p2p.html',root),'utf8');
+const worker=await readFile(new URL('gt-bybit/sw.js',root),'utf8');
 assert.match(html,/<html lang="ar" dir="rtl">/);assert.match(html,/id="secureApp"[^>]*hidden/);
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map((m)=>m[1]);assert.equal(ids.length,new Set(ids).size,'Duplicate HTML IDs');
 for(const match of html.matchAll(/(?:src|href)="(\/[^"?#]+)(?:\?[^"#]*)?"/g))await stat(new URL(match[1].slice(1),root));
@@ -14,4 +16,8 @@ for(const icon of manifest.icons){const bytes=await readFile(new URL(icon.src.sl
 assert.equal(manifest.start_url,'/');assert.equal(manifest.scope,'/');assert.equal(manifest.display,'standalone');
 assert.equal(config.rewrites.find((r)=>r.source==='/').destination,'/gt-bybit/index.html');
 assert.equal(config.outputDirectory,'public');
+assert.doesNotMatch(html,/<script(?![^>]*\bsrc=)[^>]*>/i,'Inline scripts violate the production CSP');
+assert.doesNotMatch(p2pHtml,/<script(?![^>]*\bsrc=)[^>]*>/i,'Inline scripts violate the production CSP');
+assert.match(worker,/preferences-bootstrap\.js/,'Service worker must cache the early preference bootstrap');
+assert.match(worker,/preferences\.js/,'Service worker must cache runtime preferences');
 console.log('Syntax, HTML IDs, local asset references, manifest dimensions, and routing configuration passed.');

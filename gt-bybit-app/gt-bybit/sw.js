@@ -1,9 +1,11 @@
-const CACHE='gt-bybit-shell-20260923-premium1';
-const VERSION='20260923-premium1';
+const CACHE='gt-bybit-shell-20260923-premium2';
+const VERSION='20260923-premium2';
 const STATIC=[
   '/gt-bybit/index.html',
   `/gt-bybit/app.css?v=${VERSION}`,
   `/gt-bybit/brand.css?v=${VERSION}`,
+  `/gt-bybit/preferences-bootstrap.js?v=${VERSION}`,
+  `/gt-bybit/preferences.js?v=${VERSION}`,
   `/gt-bybit/app.js?v=${VERSION}`,
   `/gt-bybit/validation.js?v=${VERSION}`,
   '/gt-bybit/manifest.webmanifest',
