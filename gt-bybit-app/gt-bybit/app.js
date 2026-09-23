@@ -139,7 +139,7 @@ function navigate(view) {
   if(state.authenticated && target==='assets') loadAssets().catch((e)=>toast(e.message,'error'));
 }
 async function applySession(session) {
-  state.session=session;state.csrf=session.csrfToken;setUnlocked(true);
+  state.session=session;state.csrf=session.csrfToken;if(state.demoMode)renderDemoFinancialState();setUnlocked(true);
   $('sessionClock').textContent='مفتوحة';
   $('sessionPolicy').textContent=`لا قفل بسبب الخمول. الصلاحية القصوى ${session.absoluteLifetimeDays} يومًا من تسجيل الدخول، أو حتى تسجيل الخروج أو إلغاء الجلسة.`;
   $('sessionExpiry').textContent=new Intl.DateTimeFormat(locale(),{dateStyle:'medium',timeStyle:'short'}).format(new Date(session.expiresAt));
