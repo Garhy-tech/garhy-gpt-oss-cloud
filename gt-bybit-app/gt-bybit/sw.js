@@ -1,5 +1,5 @@
-const CACHE='gt-bybit-shell-20260923-finops3';
-const VERSION='20260923-finops3';
+const CACHE='gt-bybit-shell-20260923-frozen1';
+const VERSION='20260923-frozen1';
 const STATIC=[
   '/gt-bybit/index.html',
   '/gt-bybit/p2p.html',

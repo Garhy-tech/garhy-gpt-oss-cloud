@@ -8,6 +8,9 @@ let initializedPendingSnapshot = false;
 let latestAds = [];
 let monitoredAdId = '';
 let priceSuggestion = null;
+let accountFrozen=false;
+const FROZEN_MESSAGE_AR='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
+const FROZEN_MESSAGE_EN='The account is temporarily frozen to protect your assets and account security. We sincerely apologize for the inconvenience. Please contact the support team.';
 
 const $ = (id) => document.getElementById(id);
 const locale = () => window.GTPreferences?.locale?.() || 'ar-EG';
@@ -15,10 +18,13 @@ const locale = () => window.GTPreferences?.locale?.() || 'ar-EG';
 function toast(message, kind = 'info') {
   const el = $('toast');
   el.textContent = message;
-  el.className = `toast show ${kind === 'error' ? 'error' : kind === 'success' ? 'success' : ''}`;
+  el.className = `toast show ${kind === 'frozen' ? 'error frozen' : kind === 'error' ? 'error' : kind === 'success' ? 'success' : ''}`;
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => { el.className = 'toast'; }, 4200);
 }
+
+function frozenMessage(){return window.GTPreferences?.language?.()==='en'?FROZEN_MESSAGE_EN:FROZEN_MESSAGE_AR;}
+function showFrozenNotice(){toast(frozenMessage(),'frozen');}
 
 function setState(state, text) {
   $('serviceState').dataset.state = state;
@@ -59,6 +65,7 @@ async function request(payload) {
 }
 
 async function financialRequest(payload) {
+  if(accountFrozen){showFrozenNotice();const error=new Error(frozenMessage());error.code='ACCOUNT_FROZEN';throw error;}
   const response=await request({...payload,confirmed:true,requestId:crypto.randomUUID()});
   window.GTReceipts?.present(response.receipt);
   return response;
@@ -237,9 +244,10 @@ async function checkStatus() {
     const result = await request({ action: 'status' });
     $('mApi').textContent = 'متاح';
     $('mApiSub').textContent = 'P2P Open API active';
-    $('capabilityText').textContent = 'P2P Open API متاح للحساب. المراقبة الآلية تعمل، والعمليات الحساسة ما زالت يدوية.';
+    accountFrozen=result.accountFrozen===true;
+    $('capabilityText').textContent = accountFrozen ? 'الحساب مجمد مؤقتا. العرض والمراقبة متاحان لكن جميع العمليات المالية محظورة حتى مراجعة فريق الدعم.' : 'P2P Open API متاح للحساب. المراقبة الآلية تعمل، والعمليات الحساسة ما زالت يدوية.';
     $('permissionAlert').classList.add('hidden');
-    setState('ok', 'P2P متصل');
+    setState(accountFrozen?'error':'ok',accountFrozen?'الحساب مجمد':'P2P متصل');
     return result;
   } catch (error) {
     $('mApi').textContent = 'مغلق';
@@ -363,6 +371,7 @@ $('monitorRefresh').addEventListener('click',async()=>{
   try{await refreshPriceMonitor(true);}catch(error){resetPriceMonitor(error.message);toast(error.message,'error');}
 });
 $('applyTargetBtn').addEventListener('click',async()=>{
+  if(accountFrozen)return showFrozenNotice();
   const data=priceSuggestion;
   if(!data?.available || !data.targetPrice || !data.ad?.itemId) return toast('لا توجد توصية صالحة للتنفيذ.','error');
   const current=String(data.ad.price ?? '—');
@@ -434,6 +443,7 @@ $('messageForm').addEventListener('submit', async (event) => {
 
 $('paidForm').addEventListener('submit', async (event) => {
   event.preventDefault();
+  if(accountFrozen)return showFrozenNotice();
   const body = formObject(event.currentTarget);
   if (body.confirm !== 'P2P_PAID') return toast('اكتب P2P_PAID حرفيًا للتأكيد.', 'error');
   if (!confirm(`تأكيد Mark as Paid للطلب ${body.orderId}؟\nنفّذ فقط إذا كنت قد أرسلت الدفع بالفعل.`)) return;
@@ -449,6 +459,7 @@ $('paidForm').addEventListener('submit', async (event) => {
 
 $('releaseForm').addEventListener('submit', async (event) => {
   event.preventDefault();
+  if(accountFrozen)return showFrozenNotice();
   const body = formObject(event.currentTarget);
   if (body.confirm !== 'RELEASE_P2P') return toast('اكتب RELEASE_P2P حرفيًا للتأكيد.', 'error');
   if (!confirm(`تحذير: سيتم Release للأصول في الطلب ${body.orderId}.\n\nلا تؤكد إلا بعد التحقق الفعلي من وصول الأموال خارج Bybit عند الحاجة.`)) return;
