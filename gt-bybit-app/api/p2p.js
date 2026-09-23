@@ -1,6 +1,9 @@
 import { BybitError, bybitRequest } from '../lib/bybit.js';
 import { requireBybitControl } from '../lib/bybit-control.js';
+import { createReceipt } from '../lib/receipts.js';
+import { selectFirstNonPromotedCompetitor, subtractDecimal, summarizeAd } from '../lib/p2p-pricing.js';
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const SAFE_AD_PAYLOAD_KEYS = new Set([
   'tokenId', 'currencyId', 'side', 'priceType', 'premium', 'price', 'minAmount', 'maxAmount',
   'remark', 'tradingPreferenceSet', 'paymentIds', 'quantity', 'paymentPeriod', 'itemId', 'actionType',
@@ -89,6 +92,29 @@ function safeAdPayload(value) {
   return result;
 }
 
+function listOf(value) {
+  if (Array.isArray(value)) return value;
+  for (const key of ['items','list','result','records']) if (Array.isArray(value?.[key])) return value[key];
+  return [];
+}
+
+function adId(ad = {}) {
+  return String(ad.itemId ?? ad.id ?? ad.adId ?? '');
+}
+
+function requireMutationReview(body, expectedConfirm) {
+  if (process.env.BYBIT_ENABLE_MUTATIONS !== 'true') fail(403, 'MUTATIONS_DISABLED', 'P2P mutations are disabled by server configuration');
+  if (body.confirm !== expectedConfirm) fail(400, 'CONFIRMATION_REQUIRED', `action requires confirm=${expectedConfirm}`);
+  if (body.confirmed !== true) fail(400, 'CONFIRMATION_REQUIRED', 'Explicit reviewed confirmation is required');
+  const requestId=text(body.requestId, 'requestId', 64);
+  if (!UUID.test(requestId)) fail(400, 'INVALID_REQUEST_ID', 'requestId must be a UUID');
+  return requestId;
+}
+
+function receiptFor(action, requestId, request, result) {
+  return createReceipt({ channel: 'P2P', action, requestId, request, result });
+}
+
 async function p2p(path, params = {}) {
   return bybitRequest('POST', path, params);
 }
@@ -161,39 +187,90 @@ async function handle(req, res) {
     return send(res, 200, { ok: true, data: data.result });
   }
 
+  if (action === 'price-monitor') {
+    const itemId=text(body.itemId, 'itemId', 100);
+    const mine=await p2p('/v5/p2p/item/personal/list', { page: 1, size: 50 });
+    const own=listOf(mine.result).find((ad)=>adId(ad)===itemId);
+    if (!own) return send(res, 200, { ok: true, data: { available: false, reason: 'OWN_AD_NOT_FOUND', itemId } });
+
+    const side=String(own.side ?? '').trim();
+    const tokenId=String(own.tokenId ?? own.tokenName ?? '').trim();
+    const currencyId=String(own.currencyId ?? own.currencyName ?? '').trim();
+    if (!side || !tokenId || !currencyId) {
+      return send(res, 200, { ok: true, data: { available: false, reason: 'OWN_AD_MARKET_INCOMPLETE', ad: summarizeAd(own), itemId } });
+    }
+
+    const market=await p2p('/v5/p2p/item/online', { page: 1, size: 20, side, tokenId, currencyId });
+    const competitor=selectFirstNonPromotedCompetitor(listOf(market.result), itemId);
+    if (!competitor) {
+      return send(res, 200, { ok: true, data: { available: false, reason: 'NO_NON_PROMOTED_COMPETITOR', ad: summarizeAd(own), itemId } });
+    }
+
+    const targetPrice=subtractDecimal(competitor.price ?? competitor.premiumPrice ?? competitor.unitPrice, '0.01');
+    if (!targetPrice) {
+      return send(res, 200, { ok: true, data: { available: false, reason: 'INVALID_COMPETITOR_PRICE', ad: summarizeAd(own), competitor: summarizeAd(competitor), itemId } });
+    }
+
+    return send(res, 200, {
+      ok: true,
+      data: {
+        available: true,
+        ad: summarizeAd(own),
+        competitor: summarizeAd(competitor),
+        targetPrice,
+        adjustment: '-0.01',
+        promotionFilter: 'explicit-markers-only',
+        executable: false,
+      },
+    });
+  }
+
   if (action === 'create-ad') {
-    if (body.confirm !== 'CREATE_P2P_AD') fail(400, 'CONFIRMATION_REQUIRED', 'create-ad requires confirm=CREATE_P2P_AD');
-    const data = await p2p('/v5/p2p/item/create', safeAdPayload(body.payload));
-    return send(res, 200, { ok: true, data: data.result });
+    const requestId=requireMutationReview(body, 'CREATE_P2P_AD');
+    const payload=safeAdPayload(body.payload);
+    const data=await p2p('/v5/p2p/item/create', payload);
+    const receipt=receiptFor(action, requestId, { payload }, data.result);
+    return send(res, 200, { ok: true, data: data.result, requestId, accepted: true, receipt });
   }
 
   if (action === 'update-ad') {
-    if (body.confirm !== 'UPDATE_P2P_AD') fail(400, 'CONFIRMATION_REQUIRED', 'update-ad requires confirm=UPDATE_P2P_AD');
-    const payload = safeAdPayload(body.payload);
-    payload.itemId = payload.itemId || text(body.itemId, 'itemId', 100);
-    const data = await p2p('/v5/p2p/item/update', payload);
-    return send(res, 200, { ok: true, data: data.result });
+    const requestId=requireMutationReview(body, 'UPDATE_P2P_AD');
+    const payload=safeAdPayload(body.payload);
+    payload.itemId=payload.itemId || text(body.itemId, 'itemId', 100);
+    const data=await p2p('/v5/p2p/item/update', payload);
+    const receipt=receiptFor(action, requestId, { payload }, data.result);
+    return send(res, 200, { ok: true, data: data.result, requestId, accepted: true, receipt });
   }
 
   if (action === 'remove-ad') {
-    if (body.confirm !== 'CANCEL_P2P_AD') fail(400, 'CONFIRMATION_REQUIRED', 'remove-ad requires confirm=CANCEL_P2P_AD');
-    const data = await p2p('/v5/p2p/item/cancel', { itemId: text(body.itemId, 'itemId', 100) });
-    return send(res, 200, { ok: true, data: data.result });
+    const requestId=requireMutationReview(body, 'CANCEL_P2P_AD');
+    const itemId=text(body.itemId, 'itemId', 100);
+    let ad=null;
+    try { ad=(await p2p('/v5/p2p/item/info', { itemId })).result; } catch {}
+    const data=await p2p('/v5/p2p/item/cancel', { itemId });
+    const receipt=receiptFor(action, requestId, { itemId, ad }, data.result);
+    return send(res, 200, { ok: true, data: data.result, requestId, accepted: true, receipt });
   }
 
   if (action === 'mark-paid') {
-    if (body.confirm !== 'P2P_PAID') fail(400, 'CONFIRMATION_REQUIRED', 'mark-paid requires confirm=P2P_PAID');
-    const data = await p2p('/v5/p2p/order/pay', {
-      orderId: text(body.orderId, 'orderId', 100),
-      paymentType: text(body.paymentType, 'paymentType', 100),
-    });
-    return send(res, 200, { ok: true, data: data.result });
+    const requestId=requireMutationReview(body, 'P2P_PAID');
+    const orderId=text(body.orderId, 'orderId', 100);
+    const paymentType=text(body.paymentType, 'paymentType', 100);
+    const data=await p2p('/v5/p2p/order/pay', { orderId, paymentType });
+    let order=null;
+    try { order=(await p2p('/v5/p2p/order/info', { orderId })).result; } catch {}
+    const receipt=receiptFor(action, requestId, { orderId, paymentType, order }, data.result);
+    return send(res, 200, { ok: true, data: data.result, requestId, accepted: true, receipt });
   }
 
   if (action === 'release') {
-    if (body.confirm !== 'RELEASE_P2P') fail(400, 'CONFIRMATION_REQUIRED', 'release requires confirm=RELEASE_P2P');
-    const data = await p2p('/v5/p2p/order/finish', { orderId: text(body.orderId, 'orderId', 100) });
-    return send(res, 200, { ok: true, data: data.result });
+    const requestId=requireMutationReview(body, 'RELEASE_P2P');
+    const orderId=text(body.orderId, 'orderId', 100);
+    const data=await p2p('/v5/p2p/order/finish', { orderId });
+    let order=null;
+    try { order=(await p2p('/v5/p2p/order/info', { orderId })).result; } catch {}
+    const receipt=receiptFor(action, requestId, { orderId, order }, data.result);
+    return send(res, 200, { ok: true, data: data.result, requestId, accepted: true, receipt });
   }
 
   if (action === 'send-message') {

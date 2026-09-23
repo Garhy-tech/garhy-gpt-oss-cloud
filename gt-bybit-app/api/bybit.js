@@ -2,6 +2,7 @@ import { AppError, assert, publicError } from '../lib/errors.js';
 import { createBybitClient, getBybitConfig } from '../lib/bybit.js';
 import { createSessionService, hash, isControlConfigured, sessionLifetime, verifyOrigin } from '../lib/bybit-control.js';
 import { createRedisStore, storeConfigured } from '../lib/store.js';
+import { createReceipt } from '../lib/receipts.js';
 import { validateAction, ValidationError, symbol, coin, text, enumValue, categories, accountTypes, convertAccountTypes, financialActions } from '../gt-bybit/validation.js';
 
 const MAX_BODY = 16 * 1024;
@@ -169,7 +170,7 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     if(!reserved) {
       const old=await store.get(key);
       assert(old?.owner === session.owner && old.fingerprint === fingerprint,'IDEMPOTENCY_CONFLICT','معرّف العملية مستخدم لطلب آخر.',409);
-      if(old.state === 'accepted') return send(res,200,{ok:true,data:old.result,requestId:body.requestId,replayed:true,accepted:true});
+      if(old.state === 'accepted') return send(res,200,{ok:true,data:old.result,requestId:body.requestId,replayed:true,accepted:true,receipt:old.receipt || createReceipt({channel:'BYBIT',action,requestId:body.requestId,request:data,result:old.result,now:now()})});
       throw new AppError('DUPLICATE_REQUEST','الطلب سبق إرساله أو حالته غير مؤكدة. راجع سجل الحساب قبل إنشاء عملية جديدة.',409);
     }
     try {
@@ -185,8 +186,9 @@ export function createHandler({ env = process.env, store = createRedisStore({env
       // Recheck durable authorization immediately before an account-changing request.
       await sessions.authenticate(req);
       const result=await request('POST',POST_PATHS[action],payload);
-      await store.set(key,{fingerprint,owner:session.owner,state:'accepted',result:result.result},172800);
-      return send(res,200,{ok:true,data:result.result,requestId:body.requestId,accepted:true});
+      const receipt=createReceipt({channel:'BYBIT',action,requestId:body.requestId,request:data,result:result.result,now:now()});
+      await store.set(key,{fingerprint,owner:session.owner,state:'accepted',result:result.result,receipt},172800);
+      return send(res,200,{ok:true,data:result.result,requestId:body.requestId,accepted:true,receipt});
     } catch(error) {
       // Preserve reservation after any error, including timeouts: never retry a money action.
       throw error;

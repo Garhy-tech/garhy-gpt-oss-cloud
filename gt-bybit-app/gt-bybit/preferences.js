@@ -91,7 +91,23 @@
     'متاح':'Available','P2P Open API متاح للحساب. المراقبة الآلية تعمل، والعمليات الحساسة ما زالت يدوية.':'P2P Open API is available. Automated monitoring is active; sensitive operations remain manual.',
     'P2P متصل':'P2P Connected','مغلق':'Unavailable','التطبيق جاهز، لكن Bybit لم تفتح صلاحيات P2P Open API للمفتاح بعد.':'The app is ready, but Bybit has not enabled P2P Open API permissions for this key yet.',
     'P2P غير متاح':'P2P Unavailable','بانتظار تفعيل صلاحيات P2P من Bybit.':'Waiting for Bybit to enable P2P permissions.','بانتظار تفعيل صلاحية Advertising من Bybit.':'Waiting for Bybit to enable the Advertising permission.',
-    'اكتب P2P_PAID حرفيًا للتأكيد.':'Type P2P_PAID exactly to confirm.','اكتب RELEASE_P2P حرفيًا للتأكيد.':'Type RELEASE_P2P exactly to confirm.','جلسة مفتوحة':'Session Open'
+    'اكتب P2P_PAID حرفيًا للتأكيد.':'Type P2P_PAID exactly to confirm.','اكتب RELEASE_P2P حرفيًا للتأكيد.':'Type RELEASE_P2P exactly to confirm.','جلسة مفتوحة':'Session Open',
+    'مراقب ترتيب الإعلان':'Ad Ranking Monitor',
+    'يراقب أول منافس غير معلّم كترويجي ويقترح سعرًا أقل بـ 0.01 فقط.':'Tracks the first competitor not explicitly marked as promoted and suggests a price lower by 0.01 only.',
+    'تحديث السوق':'Refresh Market',
+    'الإعلان المراقب':'Monitored Ad',
+    'سعرك الحالي':'Your Current Price',
+    'أول منافس غير ترويجي':'First Non-Promoted Competitor',
+    'السعر المقترح':'Suggested Price',
+    'بانتظار بيانات السوق.':'Waiting for market data.',
+    'مراجعة تحديث السعر':'Review Price Update',
+    'المراقبة آلية، أما تعديل السعر الحقيقي فلا يتم تلقائيًا: REVIEW → CONFIRM → EXECUTE.':'Monitoring is automatic, but live price changes are never automatic: REVIEW → CONFIRM → EXECUTE.',
+    'إيصال العملية':'Transaction Receipt',
+    'تفاصيل الطلب':'Request Details',
+    'استجابة Bybit':'Bybit Response',
+    'تحميل PDF':'Download PDF',
+    'إغلاق':'Close',
+    'الإيصال يثبت الطلب الذي قبلته الخدمة. بعض العمليات تحتاج مراجعة سجل الحساب للتأكد من حالة التسوية النهائية.':'This receipt records the request accepted by the service. Some operations require account-history verification for final settlement status.'
   };
 
   const AR = new Map(Object.entries(EN).map(([ar, en]) => [en, ar]));

@@ -25,3 +25,11 @@ test('service worker caches preference runtime dependencies',()=>{
   assert.match(source,/preferences-bootstrap\.js/);
   assert.match(source,/preferences\.js/);
 });
+
+test('service worker caches P2P shell, receipts, logo and watermark only',()=>{
+  assert.match(source,/p2p-console\.js/);
+  assert.match(source,/receipts\.js/);
+  assert.match(source,/brand\/gt-logo\.png/);
+  assert.match(source,/brand\/gt-watermark\.webp/);
+  assert.doesNotMatch(source,/icon-(?:180|192|512)|gt-profile|gt-primary|gt-app-mark|garhy-tech-signature/);
+});

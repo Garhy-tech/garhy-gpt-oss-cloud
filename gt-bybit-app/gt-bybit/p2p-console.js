@@ -5,6 +5,9 @@ let controlToken = '';
 let pollTimer = null;
 let knownPendingIds = new Set();
 let initializedPendingSnapshot = false;
+let latestAds = [];
+let monitoredAdId = '';
+let priceSuggestion = null;
 
 const $ = (id) => document.getElementById(id);
 const locale = () => window.GTPreferences?.locale?.() || 'ar-EG';
@@ -55,6 +58,12 @@ async function request(payload) {
   return data;
 }
 
+async function financialRequest(payload) {
+  const response=await request({...payload,confirmed:true,requestId:crypto.randomUUID()});
+  window.GTReceipts?.present(response.receipt);
+  return response;
+}
+
 function extractList(payload) {
   const data = payload?.data;
   if (Array.isArray(data)) return data;
@@ -103,23 +112,86 @@ function renderPending(payload) {
   handlePendingNotifications(list);
 }
 
+function syncMonitorSelector() {
+  const select=$('monitorAdSelect');
+  if(!select) return;
+  const current=select.value || monitoredAdId;
+  select.replaceChildren();
+  for(const ad of latestAds) {
+    const itemId=String(firstValue(ad,['itemId','id'],''));
+    if(!itemId) continue;
+    const option=document.createElement('option');
+    option.value=itemId;
+    option.textContent=`${firstValue(ad,['tokenId','tokenName'],'Asset')} · ${firstValue(ad,['currencyId','currencyName'],'Fiat')} · ${firstValue(ad,['price'],'—')}`;
+    select.append(option);
+  }
+  if([...select.options].some((option)=>option.value===current)) select.value=current;
+  monitoredAdId=select.value || '';
+  if(!monitoredAdId) resetPriceMonitor('لا يوجد إعلان متاح للمراقبة.');
+}
+
 function renderAds(payload) {
-  const list = extractList(payload);
-  $('mAds').textContent = String(list.length);
-  if (!list.length) {
-    $('adsTable').innerHTML = '<div class="empty">لا توجد إعلانات قابلة للعرض أو الصلاحية لم تُفتح بعد.</div>';
+  const list=extractList(payload);
+  latestAds=list;
+  $('mAds').textContent=String(list.length);
+  if(!list.length) {
+    $('adsTable').innerHTML='<div class="empty">لا توجد إعلانات قابلة للعرض أو الصلاحية لم تُفتح بعد.</div>';
+    syncMonitorSelector();
     return;
   }
-  $('adsTable').innerHTML = `<table><thead><tr><th>Ad ID</th><th>Side</th><th>Token</th><th>Fiat</th><th>Price</th><th>Min</th><th>Max</th><th>Status</th></tr></thead><tbody>${list.map((ad) => `<tr>
-    <td>${escapeHtml(firstValue(ad, ['itemId', 'id']))}</td>
-    <td>${escapeHtml(firstValue(ad, ['side']))}</td>
-    <td>${escapeHtml(firstValue(ad, ['tokenId', 'tokenName']))}</td>
-    <td>${escapeHtml(firstValue(ad, ['currencyId', 'currencyName']))}</td>
-    <td>${escapeHtml(firstValue(ad, ['price']))}</td>
-    <td>${escapeHtml(firstValue(ad, ['minAmount', 'minQuote']))}</td>
-    <td>${escapeHtml(firstValue(ad, ['maxAmount', 'maxQuote']))}</td>
-    <td>${escapeHtml(firstValue(ad, ['status']))}</td>
+  $('adsTable').innerHTML=`<table><thead><tr><th>Ad ID</th><th>Side</th><th>Token</th><th>Fiat</th><th>Price</th><th>Min</th><th>Max</th><th>Status</th></tr></thead><tbody>${list.map((ad)=>`<tr>
+    <td>${escapeHtml(firstValue(ad,['itemId','id']))}</td>
+    <td>${escapeHtml(firstValue(ad,['side']))}</td>
+    <td>${escapeHtml(firstValue(ad,['tokenId','tokenName']))}</td>
+    <td>${escapeHtml(firstValue(ad,['currencyId','currencyName']))}</td>
+    <td>${escapeHtml(firstValue(ad,['price']))}</td>
+    <td>${escapeHtml(firstValue(ad,['minAmount','minQuote']))}</td>
+    <td>${escapeHtml(firstValue(ad,['maxAmount','maxQuote']))}</td>
+    <td>${escapeHtml(firstValue(ad,['status']))}</td>
   </tr>`).join('')}</tbody></table>`;
+  syncMonitorSelector();
+}
+
+function resetPriceMonitor(message='بانتظار بيانات السوق.') {
+  priceSuggestion=null;
+  for(const id of ['monitorCurrentPrice','monitorCompetitorPrice','monitorTargetPrice']) {
+    if($(id)) $(id).textContent='—';
+  }
+  if($('monitorStatus')) $('monitorStatus').textContent=message;
+  if($('applyTargetBtn')) $('applyTargetBtn').disabled=true;
+}
+
+function renderPriceMonitor(payload) {
+  const data=payload?.data || {};
+  if(!data.available) {
+    const messages={
+      OWN_AD_NOT_FOUND:'لم يتم العثور على الإعلان المحدد ضمن إعلانات الحساب.',
+      OWN_AD_MARKET_INCOMPLETE:'بيانات السوق للإعلان غير مكتملة.',
+      NO_NON_PROMOTED_COMPETITOR:'لا يوجد معلن منافس غير معلّم كترويجي يمكن استخدامه حاليًا.',
+      INVALID_COMPETITOR_PRICE:'سعر أول منافس غير صالح للحساب.',
+    };
+    resetPriceMonitor(messages[data.reason] || 'لا توجد توصية سعر متاحة حاليًا.');
+    return;
+  }
+  priceSuggestion=data;
+  $('monitorCurrentPrice').textContent=String(data.ad?.price ?? '—');
+  $('monitorCompetitorPrice').textContent=String(data.competitor?.price ?? '—');
+  $('monitorTargetPrice').textContent=String(data.targetPrice ?? '—');
+  $('monitorStatus').textContent='المقترح أقل 0.01 من أول إعلان منافس غير معلّم كترويجي. التحديث الحقيقي لا ينفذ تلقائيًا.';
+  $('applyTargetBtn').disabled=false;
+}
+
+async function refreshPriceMonitor(showToast=false) {
+  const itemId=$('monitorAdSelect')?.value || monitoredAdId;
+  if(!itemId) {
+    resetPriceMonitor('اختر إعلانًا للمراقبة.');
+    return null;
+  }
+  monitoredAdId=itemId;
+  const result=await request({action:'price-monitor',itemId});
+  renderPriceMonitor(result);
+  if(showToast) toast('تم تحديث مراقب سعر P2P.','success');
+  return result;
 }
 
 function handlePendingNotifications(list) {
@@ -134,7 +206,7 @@ function handlePendingNotifications(list) {
   if (!newIds.length || !('Notification' in window) || Notification.permission !== 'granted') return;
   new Notification('GT.BYBIT · طلب P2P جديد', {
     body: `${newIds.length} طلب Pending جديد يحتاج متابعة.`,
-    icon: '/assets/gt-bybit/icon-192.png',
+    icon: '/assets/gt-bybit/brand/gt-logo.png',
     tag: 'gt-bybit-p2p-pending',
   });
 }
@@ -198,6 +270,7 @@ async function refreshAll(showToast = false) {
   try {
     await checkStatus();
     await Promise.all([refreshPending(false), refreshAds(false)]);
+    await refreshPriceMonitor(false).catch(()=>resetPriceMonitor('تعذر تحديث مراقب السعر.'));
     $('mSync').textContent = new Date().toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
     if (showToast) toast('تمت مزامنة P2P بنجاح.', 'success');
   } catch (error) {
@@ -282,6 +355,37 @@ $('autoRefresh').addEventListener('change', () => {
   startPolling();
   toast($('autoRefresh').checked ? 'تم تشغيل المراقبة كل 30 ثانية.' : 'تم إيقاف المراقبة الآلية.');
 });
+$('monitorAdSelect').addEventListener('change',async(event)=>{
+  monitoredAdId=event.currentTarget.value;
+  try{await refreshPriceMonitor(true);}catch(error){resetPriceMonitor(error.message);toast(error.message,'error');}
+});
+$('monitorRefresh').addEventListener('click',async()=>{
+  try{await refreshPriceMonitor(true);}catch(error){resetPriceMonitor(error.message);toast(error.message,'error');}
+});
+$('applyTargetBtn').addEventListener('click',async()=>{
+  const data=priceSuggestion;
+  if(!data?.available || !data.targetPrice || !data.ad?.itemId) return toast('لا توجد توصية صالحة للتنفيذ.','error');
+  const current=String(data.ad.price ?? '—');
+  const competitor=String(data.competitor?.price ?? '—');
+  const target=String(data.targetPrice);
+  if(!confirm(`مراجعة تحديث سعر إعلان P2P\n\nالسعر الحالي: ${current}\nأول منافس غير معلّم كترويجي: ${competitor}\nالسعر المقترح: ${target}\n\nلن يتم التنفيذ إلا بعد هذا التأكيد. هل تريد تطبيق السعر؟`)) return;
+  try{
+    $('applyTargetBtn').disabled=true;
+    await financialRequest({
+      action:'update-ad',
+      itemId:data.ad.itemId,
+      payload:{itemId:data.ad.itemId,price:target},
+      confirm:'UPDATE_P2P_AD',
+    });
+    toast('تم إرسال تحديث السعر إلى Bybit وتم إنشاء إيصال PDF.','success');
+    await refreshAds(false);
+    await refreshPriceMonitor(false);
+  }catch(error){
+    toast(error.message,'error');
+  }finally{
+    $('applyTargetBtn').disabled=!priceSuggestion?.available;
+  }
+});
 
 $('notifyBtn').addEventListener('click', async () => {
   if (!('Notification' in window)) return toast('المتصفح لا يدعم الإشعارات.', 'error');
@@ -334,8 +438,8 @@ $('paidForm').addEventListener('submit', async (event) => {
   if (body.confirm !== 'P2P_PAID') return toast('اكتب P2P_PAID حرفيًا للتأكيد.', 'error');
   if (!confirm(`تأكيد Mark as Paid للطلب ${body.orderId}؟\nنفّذ فقط إذا كنت قد أرسلت الدفع بالفعل.`)) return;
   try {
-    await request({ action: 'mark-paid', orderId: body.orderId, paymentType: body.paymentType, confirm: 'P2P_PAID' });
-    toast('تم إرسال Mark as Paid إلى Bybit.', 'success');
+    await financialRequest({ action: 'mark-paid', orderId: body.orderId, paymentType: body.paymentType, confirm: 'P2P_PAID' });
+    toast('تم إرسال Mark as Paid إلى Bybit وتم إنشاء إيصال PDF.', 'success');
     event.currentTarget.elements.confirm.value = '';
     await refreshAll(false);
   } catch (error) {
@@ -349,8 +453,8 @@ $('releaseForm').addEventListener('submit', async (event) => {
   if (body.confirm !== 'RELEASE_P2P') return toast('اكتب RELEASE_P2P حرفيًا للتأكيد.', 'error');
   if (!confirm(`تحذير: سيتم Release للأصول في الطلب ${body.orderId}.\n\nلا تؤكد إلا بعد التحقق الفعلي من وصول الأموال خارج Bybit عند الحاجة.`)) return;
   try {
-    await request({ action: 'release', orderId: body.orderId, confirm: 'RELEASE_P2P' });
-    toast('تم إرسال Release Assets إلى Bybit.', 'success');
+    await financialRequest({ action: 'release', orderId: body.orderId, confirm: 'RELEASE_P2P' });
+    toast('تم إرسال Release Assets إلى Bybit وتم إنشاء إيصال PDF.', 'success');
     event.currentTarget.elements.confirm.value = '';
     await refreshAll(false);
   } catch (error) {

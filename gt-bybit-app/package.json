@@ -10,6 +10,6 @@
     "test": "node --test test/*.test.js",
     "check": "node scripts/check.mjs",
     "dev": "node scripts/dev-server.mjs",
-    "build": "node scripts/check.mjs && node scripts/build.mjs"
+    "build": "node --test test/*.test.js && node scripts/check.mjs && node scripts/build.mjs"
   }
 }
