@@ -283,6 +283,17 @@ async function refreshAll(showToast = false) {
   if (!controlToken) return;
   try {
     await checkStatus();
+    if(demoMode){
+      latestAds=[];
+      $('mPending').textContent='—';
+      $('mAds').textContent='—';
+      $('pendingTable').innerHTML='<div class="empty">وضع تجريبي: لا يتم تحميل طلبات P2P الحية.</div>';
+      $('adsTable').innerHTML='<div class="empty">وضع تجريبي: لا يتم تحميل إعلانات P2P الحية.</div>';
+      resetPriceMonitor('وضع تجريبي: مراقبة السعر الحية متوقفة.');
+      $('mSync').textContent = new Date().toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
+      if (showToast) toast('وضع تجريبي — لا توجد مزامنة مالية حية.', 'success');
+      return;
+    }
     await Promise.all([refreshPending(false), refreshAds(false)]);
     await refreshPriceMonitor(false).catch(()=>resetPriceMonitor('تعذر تحديث مراقب السعر.'));
     $('mSync').textContent = new Date().toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
