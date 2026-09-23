@@ -1,13 +1,16 @@
-const CACHE='gt-bybit-shell-20260919-identity1';
-const VERSION='20260919-identity1';
+const CACHE='gt-bybit-shell-20260923-premium1';
+const VERSION='20260923-premium1';
 const STATIC=[
   '/gt-bybit/index.html',
   `/gt-bybit/app.css?v=${VERSION}`,
+  `/gt-bybit/brand.css?v=${VERSION}`,
   `/gt-bybit/app.js?v=${VERSION}`,
   `/gt-bybit/validation.js?v=${VERSION}`,
   '/gt-bybit/manifest.webmanifest',
   '/assets/gt-bybit/icon-180.png','/assets/gt-bybit/icon-192.png','/assets/gt-bybit/icon-512.png',
   '/assets/gt-bybit/icon-maskable-192.png','/assets/gt-bybit/icon-maskable-512.png','/assets/gt-bybit/gt-profile.jpg',
+  '/assets/gt-bybit/brand/gt-primary.webp','/assets/gt-bybit/brand/gt-watermark.webp',
+  '/assets/gt-bybit/brand/garhy-tech-signature.webp','/assets/gt-bybit/brand/gt-app-mark.webp',
 ];
 const ALLOWED=new Set(STATIC.map((path)=>new URL(path,self.location.origin).pathname));
 self.addEventListener('install',(event)=>{
