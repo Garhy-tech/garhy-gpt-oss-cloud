@@ -44,22 +44,25 @@ test('mutations require cookie, same origin, CSRF, explicit confirmation and req
   assert.equal(s.calls.length,0);
 });
 
-test('production frozen-account mode keeps financial data live-only and blocks mutations before Bybit',async()=>{
+test('production uses live Bybit financial data and does not auto-freeze the account',async()=>{
   const env={...fixtureEnv(),VERCEL_ENV:'production'};
   const s=await setup({env});
   const health=await invoke(s.handler,{query:{action:'health'}});
   assert.equal(health.statusCode,200);
-  assert.equal(health.body.accountFrozen,true);
-  assert.equal(health.body.financialDataMode,'presentation');
-  assert.equal(Object.hasOwn(health.body,'frozenBalanceUsd'),false);
+  assert.equal(health.body.accountFrozen,false);
+  assert.equal(health.body.financialDataMode,'live');
 
   const wallet=await invoke(s.handler,{query:{action:'wallet'},cookie:s.cookie});
-  assert.equal(wallet.statusCode,403);
-  assert.equal(wallet.body.error,'PRESENTATION_MODE_LIVE_DATA_BLOCKED');
+  assert.equal(wallet.statusCode,200);
+  assert.equal(wallet.body.data.list[0].totalEquity,'12345.67');
+});
 
-  const quote=await invoke(s.handler,{method:'POST',body:{action:'convert-quote',fromCoin:'USDT',toCoin:'USDC',requestAmount:'10',accountType:'eb_convert_uta'},cookie:s.cookie,csrf:s.csrf});
-  assert.equal(quote.statusCode,423);
-  assert.equal(quote.body.error,'ACCOUNT_FROZEN');
+test('explicit production freeze still blocks financial mutations before Bybit',async()=>{
+  const env={...fixtureEnv(),VERCEL_ENV:'production',GT_ACCOUNT_FROZEN:'true'};
+  const s=await setup({env});
+  const health=await invoke(s.handler,{query:{action:'health'}});
+  assert.equal(health.body.accountFrozen,true);
+  assert.equal(health.body.financialDataMode,'live');
 
   const mutation=await invoke(s.handler,{method:'POST',body:money(order),cookie:s.cookie,csrf:s.csrf});
   assert.equal(mutation.statusCode,423);
