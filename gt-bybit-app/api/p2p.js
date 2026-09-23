@@ -129,6 +129,22 @@ async function handle(req, res) {
   const body = bodyOf(req);
   const action = text(body.action, 'action', 80).toLowerCase();
 
+  if (isDemoFinancialMode(process.env)) {
+    if (action === 'status' || action === 'user-info') {
+      return send(res, 200, {
+        ok: true,
+        available: true,
+        service: 'bybit-p2p-v5',
+        data: {},
+        accountFrozen: false,
+        financialDataMode: 'demo',
+        frozenMessage: null,
+        timestamp: Date.now(),
+      });
+    }
+    fail(403, 'DEMO_MODE_LIVE_DATA_BLOCKED', 'Demo mode does not read or mutate live P2P financial data');
+  }
+
   if (action === 'status' || action === 'user-info') {
     const data = await p2p('/v5/p2p/user/personal/info', {});
     return send(res, 200, {
