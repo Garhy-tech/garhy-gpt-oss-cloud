@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#071b3d" />
+  <meta name="theme-color" content="#06101F" />
   <meta name="color-scheme" content="dark light" />
   <script>
     (()=>{try{const t=localStorage.getItem('gt-bybit-theme')==='light'?'light':'dark';const l=localStorage.getItem('gt-bybit-language')==='en'?'en':'ar';document.documentElement.dataset.theme=t;document.documentElement.dataset.lang=l;document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';document.documentElement.style.colorScheme=t;}catch{}})();
@@ -11,15 +11,16 @@
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <meta name="referrer" content="no-referrer" />
   <title>GT.BYBIT · P2P Control</title>
-  <link rel="icon" type="image/png" sizes="192x192" href="/assets/gt-bybit/icon-192.png" />
-  <link rel="stylesheet" href="/gt-bybit/p2p-console.css?v=20260922-theme-i18n1" />
+  <link rel="icon" type="image/webp" sizes="192x192" href="/assets/gt-bybit/brand/gt-app-mark.webp" />
+  <link rel="stylesheet" href="/gt-bybit/p2p-console.css?v=20260923-premium1" />
+  <link rel="stylesheet" href="/gt-bybit/brand.css?v=20260923-premium1" />
 </head>
 <body>
   <div id="offlineBanner" class="offline hidden">أنت غير متصل بالإنترنت — جميع عمليات P2P متوقفة.</div>
 
   <header class="topbar">
     <div class="brand">
-      <img src="/assets/gt-bybit/icon-192.png" alt="" />
+      <img src="/assets/gt-bybit/brand/gt-primary.webp" alt="" />
       <div><strong>GT.BYBIT</strong><small>P2P CONTROL · GARHY TECH</small></div>
     </div>
     <div class="top-actions">
@@ -40,13 +41,14 @@
         <button id="connectBtn" class="btn primary" type="button">فتح جلسة P2P</button>
       </div>
       <div class="security-line">Control Token يبقى في ذاكرة الصفحة فقط ولا يوجد قفل تلقائي بمرور الوقت. تنتهي الجلسة عند تسجيل الخروج أو إغلاق/تحديث الصفحة.</div>
+      <div class="corporate-endorsement"><img src="/assets/gt-bybit/brand/garhy-tech-signature.webp" alt="GARHY TECH · Founder Office" /></div>
     </section>
 
     <section id="console" class="hidden">
       <section class="hero">
         <div>
           <span class="eyebrow">LIVE P2P OPERATIONS</span>
-          <h1>P2P Operations Center</h1>
+          <h1>مركز عمليات P2P</h1>
           <p id="capabilityText">جارٍ التحقق من صلاحيات P2P Open API…</p>
         </div>
         <div class="hero-actions">
@@ -148,7 +150,7 @@
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/gt-bybit/preferences.js?v=20260922-theme-i18n1"></script>
-  <script src="/gt-bybit/p2p-console.js?v=20260922-theme-i18n1" defer></script>
+  <script src="/gt-bybit/preferences.js?v=20260923-premium1"></script>
+  <script src="/gt-bybit/p2p-console.js?v=20260923-premium1" defer></script>
 </body>
 </html>
