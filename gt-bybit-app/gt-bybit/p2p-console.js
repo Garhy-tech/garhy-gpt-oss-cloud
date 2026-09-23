@@ -9,8 +9,11 @@ let latestAds = [];
 let monitoredAdId = '';
 let priceSuggestion = null;
 let accountFrozen=false;
+let demoMode=false;
 const FROZEN_MESSAGE_AR='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
 const FROZEN_MESSAGE_EN='The account is temporarily frozen to protect your assets and account security. We sincerely apologize for the inconvenience. Please contact the support team.';
+const DEMO_MESSAGE_AR='وضع تجريبي — لا يتم تنفيذ أي عمليات مالية حقيقية.';
+const DEMO_MESSAGE_EN='Demo Mode — no real financial operations are executed.';
 
 const $ = (id) => document.getElementById(id);
 const locale = () => window.GTPreferences?.locale?.() || 'ar-EG';
@@ -24,7 +27,9 @@ function toast(message, kind = 'info') {
 }
 
 function frozenMessage(){return window.GTPreferences?.language?.()==='en'?FROZEN_MESSAGE_EN:FROZEN_MESSAGE_AR;}
+function demoMessage(){return window.GTPreferences?.language?.()==='en'?DEMO_MESSAGE_EN:DEMO_MESSAGE_AR;}
 function showFrozenNotice(){toast(frozenMessage(),'frozen');}
+function showDemoNotice(){toast(demoMessage(),'error');}
 
 function setState(state, text) {
   $('serviceState').dataset.state = state;
@@ -65,6 +70,7 @@ async function request(payload) {
 }
 
 async function financialRequest(payload) {
+  if(demoMode){showDemoNotice();const error=new Error(demoMessage());error.code='DEMO_MODE_MUTATION_BLOCKED';throw error;}
   if(accountFrozen){showFrozenNotice();const error=new Error(frozenMessage());error.code='ACCOUNT_FROZEN';throw error;}
   const response=await request({...payload,confirmed:true,requestId:crypto.randomUUID()});
   window.GTReceipts?.present(response.receipt);
@@ -244,10 +250,10 @@ async function checkStatus() {
     const result = await request({ action: 'status' });
     $('mApi').textContent = 'متاح';
     $('mApiSub').textContent = 'P2P Open API active';
-    accountFrozen=result.accountFrozen===true;
-    $('capabilityText').textContent = accountFrozen ? 'الحساب مجمد مؤقتا. العرض والمراقبة متاحان لكن جميع العمليات المالية محظورة حتى مراجعة فريق الدعم.' : 'P2P Open API متاح للحساب. المراقبة الآلية تعمل، والعمليات الحساسة ما زالت يدوية.';
+    accountFrozen=result.accountFrozen===true;demoMode=result.financialDataMode==='demo';
+    $('capabilityText').textContent = demoMode ? 'وضع تجريبي: المراقبة متاحة، وأي عملية مالية حقيقية محظورة.' : accountFrozen ? 'الحساب مجمد مؤقتا. العرض والمراقبة متاحان لكن جميع العمليات المالية محظورة حتى مراجعة فريق الدعم.' : 'P2P Open API متاح للحساب. المراقبة الآلية تعمل، والعمليات الحساسة ما زالت يدوية.';
     $('permissionAlert').classList.add('hidden');
-    setState(accountFrozen?'error':'ok',accountFrozen?'الحساب مجمد':'P2P متصل');
+    setState((demoMode||accountFrozen)?'error':'ok',demoMode?'وضع تجريبي':accountFrozen?'الحساب مجمد':'P2P متصل');
     return result;
   } catch (error) {
     $('mApi').textContent = 'مغلق';
