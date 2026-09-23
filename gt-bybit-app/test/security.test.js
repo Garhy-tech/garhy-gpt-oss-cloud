@@ -75,6 +75,10 @@ test('preview demo mode is explicit and blocks all financial mutations before By
   assert.equal(health.body.financialDataMode,'demo');
   assert.equal(health.body.accountFrozen,false);
 
+  const wallet=await invoke(s.handler,{query:{action:'wallet'},cookie:s.cookie});
+  assert.equal(wallet.statusCode,403);
+  assert.equal(wallet.body.error,'DEMO_MODE_LIVE_DATA_BLOCKED');
+
   const quote=await invoke(s.handler,{method:'POST',body:{action:'convert-quote',fromCoin:'USDT',toCoin:'USDC',requestAmount:'10',accountType:'eb_convert_uta'},cookie:s.cookie,csrf:s.csrf});
   assert.equal(quote.statusCode,403);
   assert.equal(quote.body.error,'DEMO_MODE_MUTATION_BLOCKED');
