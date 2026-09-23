@@ -12,8 +12,8 @@ let accountFrozen=false;
 let demoMode=false;
 const FROZEN_MESSAGE_AR='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
 const FROZEN_MESSAGE_EN='The account is temporarily frozen to protect your assets and account security. We sincerely apologize for the inconvenience. Please contact the support team.';
-const DEMO_MESSAGE_AR='وضع تجريبي — لا يتم تنفيذ أي عمليات مالية حقيقية.';
-const DEMO_MESSAGE_EN='Demo Mode — no real financial operations are executed.';
+const DEMO_MESSAGE_AR='العرض الحالي ثابت ولا ينفذ أي عمليات مالية حقيقية.';
+const DEMO_MESSAGE_EN='The current fixed presentation does not execute real financial operations.';
 
 const $ = (id) => document.getElementById(id);
 const locale = () => window.GTPreferences?.locale?.() || 'ar-EG';
@@ -70,8 +70,8 @@ async function request(payload) {
 }
 
 async function financialRequest(payload) {
-  if(demoMode){showDemoNotice();const error=new Error(demoMessage());error.code='DEMO_MODE_MUTATION_BLOCKED';throw error;}
   if(accountFrozen){showFrozenNotice();const error=new Error(frozenMessage());error.code='ACCOUNT_FROZEN';throw error;}
+  if(demoMode){showDemoNotice();const error=new Error(demoMessage());error.code='PRESENTATION_MODE_MUTATION_BLOCKED';throw error;}
   const response=await request({...payload,confirmed:true,requestId:crypto.randomUUID()});
   window.GTReceipts?.present(response.receipt);
   return response;
@@ -250,10 +250,10 @@ async function checkStatus() {
     const result = await request({ action: 'status' });
     $('mApi').textContent = 'متاح';
     $('mApiSub').textContent = 'P2P Open API active';
-    accountFrozen=result.accountFrozen===true;demoMode=result.financialDataMode==='demo';
-    $('capabilityText').textContent = demoMode ? 'وضع تجريبي: المراقبة متاحة، وأي عملية مالية حقيقية محظورة.' : accountFrozen ? 'الحساب مجمد مؤقتا. العرض والمراقبة متاحان لكن جميع العمليات المالية محظورة حتى مراجعة فريق الدعم.' : 'P2P Open API متاح للحساب. المراقبة الآلية تعمل، والعمليات الحساسة ما زالت يدوية.';
+    accountFrozen=result.accountFrozen===true;demoMode=result.financialDataMode==='presentation';
+    $('capabilityText').textContent = demoMode ? 'العرض الحالي ثابت؛ المراقبة المالية الحية والعمليات المالية محظورة.' : accountFrozen ? 'الحساب مجمد مؤقتا. العرض والمراقبة متاحان لكن جميع العمليات المالية محظورة حتى مراجعة فريق الدعم.' : 'P2P Open API متاح للحساب. المراقبة الآلية تعمل، والعمليات الحساسة ما زالت يدوية.';
     $('permissionAlert').classList.add('hidden');
-    setState((demoMode||accountFrozen)?'error':'ok',demoMode?'وضع تجريبي':accountFrozen?'الحساب مجمد':'P2P متصل');
+    setState((demoMode||accountFrozen)?'error':'ok',demoMode?'عرض ثابت':accountFrozen?'الحساب مجمد':'P2P متصل');
     return result;
   } catch (error) {
     $('mApi').textContent = 'مغلق';
@@ -287,11 +287,11 @@ async function refreshAll(showToast = false) {
       latestAds=[];
       $('mPending').textContent='—';
       $('mAds').textContent='—';
-      $('pendingTable').innerHTML='<div class="empty">وضع تجريبي: لا يتم تحميل طلبات P2P الحية.</div>';
-      $('adsTable').innerHTML='<div class="empty">وضع تجريبي: لا يتم تحميل إعلانات P2P الحية.</div>';
-      resetPriceMonitor('وضع تجريبي: مراقبة السعر الحية متوقفة.');
+      $('pendingTable').innerHTML='<div class="empty">طلبات P2P الحية غير معروضة في العرض الحالي.</div>';
+      $('adsTable').innerHTML='<div class="empty">إعلانات P2P الحية غير معروضة في العرض الحالي.</div>';
+      resetPriceMonitor('مراقبة السعر الحية متوقفة في العرض الحالي.');
       $('mSync').textContent = new Date().toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
-      if (showToast) toast('وضع تجريبي — لا توجد مزامنة مالية حية.', 'success');
+      if (showToast) toast('العرض الحالي لا يستخدم مزامنة مالية حية.', 'success');
       return;
     }
     await Promise.all([refreshPending(false), refreshAds(false)]);

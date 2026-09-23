@@ -92,7 +92,7 @@
     'P2P متصل':'P2P Connected','مغلق':'Unavailable','التطبيق جاهز، لكن Bybit لم تفتح صلاحيات P2P Open API للمفتاح بعد.':'The app is ready, but Bybit has not enabled P2P Open API permissions for this key yet.',
     'P2P غير متاح':'P2P Unavailable','بانتظار تفعيل صلاحيات P2P من Bybit.':'Waiting for Bybit to enable P2P permissions.','بانتظار تفعيل صلاحية Advertising من Bybit.':'Waiting for Bybit to enable the Advertising permission.',
     'اكتب P2P_PAID حرفيًا للتأكيد.':'Type P2P_PAID exactly to confirm.','اكتب RELEASE_P2P حرفيًا للتأكيد.':'Type RELEASE_P2P exactly to confirm.','جلسة مفتوحة':'Session Open',
-    'مراقب ترتيب الإعلان':'Ad Ranking Monitor',
+    'رصيد عرض ثابت · غير متصل بالرصيد الحي':'Fixed display balance · not connected to live balance','مراقب ترتيب الإعلان':'Ad Ranking Monitor',
     'يراقب أول منافس غير معلّم كترويجي ويقترح سعرًا أقل بـ 0.01 فقط.':'Tracks the first competitor not explicitly marked as promoted and suggests a price lower by 0.01 only.',
     'تحديث السوق':'Refresh Market',
     'الإعلان المراقب':'Monitored Ad',

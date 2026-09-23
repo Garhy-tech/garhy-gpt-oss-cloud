@@ -108,13 +108,13 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     if (action === 'health') {
       let bybitConfigured = false;
       try { getBybitConfig(env); bybitConfigured = true; } catch { /* report only readiness */ }
-      return send(res,200,{ok:true,service:'gt-bybit-v5',version:'2.0.0',region:env.VERCEL_REGION || 'local',controlReady:isControlConfigured(env) && storageReady(),bybitConfigured,sessionStoreReady:storageReady(),liveConnectivity:'UNTESTED',mutationsEnabled:env.BYBIT_ENABLE_MUTATIONS === 'true',accountFrozen:accountFrozen(env),frozenMessage:accountFrozen(env)?FROZEN_MESSAGE:null,financialDataMode:isDemoFinancialMode(env)?'demo':'live',absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false});
+      return send(res,200,{ok:true,service:'gt-bybit-v5',version:'2.0.0',region:env.VERCEL_REGION || 'local',controlReady:isControlConfigured(env) && storageReady(),bybitConfigured,sessionStoreReady:storageReady(),liveConnectivity:'UNTESTED',mutationsEnabled:env.BYBIT_ENABLE_MUTATIONS === 'true',accountFrozen:accountFrozen(env),frozenMessage:accountFrozen(env)?FROZEN_MESSAGE:null,financialDataMode:isDemoFinancialMode(env)?'presentation':'live',absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false});
     }
     assert(!req.headers['sec-fetch-site'] || req.headers['sec-fetch-site'] === 'same-origin', 'ORIGIN_DENIED', 'مصدر الطلب غير مصرح به.', 403);
     const session = await sessions.authenticate(req,action !== 'session');
     if (action === 'session') return send(res,200,session ? {ok:true,authenticated:true,csrfToken:session.csrf,expiresAt:session.expiresAt,absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false} : {ok:true,authenticated:false});
     if (isDemoFinancialMode(env) && ['wallet','positions','orders','order-history','executions','assets','transfer-coins','transfers','convert-history','convert-status'].includes(action)) {
-      throw new AppError('DEMO_MODE_LIVE_DATA_BLOCKED','الوضع التجريبي لا يقرأ البيانات المالية الحية من Bybit.',403);
+      throw new AppError('PRESENTATION_MODE_LIVE_DATA_BLOCKED','العرض الثابت لا يقرأ البيانات المالية الحية من Bybit.',403);
     }
     await sessions.rateLimit(`read:${session.owner}`,120);
     let path, params = {};
@@ -157,8 +157,8 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     const data=validateAction(body);
     const payload=withoutMeta(data);
     const action=data.action;
-    if(isDemoFinancialMode(env) && (action==='convert-quote' || financialActions.includes(action))) throw new AppError('DEMO_MODE_MUTATION_BLOCKED','الوضع التجريبي لا ينفذ عمليات مالية حقيقية.',403);
     if(accountFrozen(env) && (action==='convert-quote' || financialActions.includes(action))) throw new AppError('ACCOUNT_FROZEN',FROZEN_MESSAGE,423);
+    if(isDemoFinancialMode(env) && (action==='convert-quote' || financialActions.includes(action))) throw new AppError('PRESENTATION_MODE_MUTATION_BLOCKED','العرض الثابت لا ينفذ عمليات مالية حقيقية.',403);
     if(action === 'convert-quote') {
       const result=await request('POST',POST_PATHS[action],{...payload,requestCoin:data.fromCoin});
       const quote=result.result;

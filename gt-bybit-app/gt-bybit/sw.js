@@ -1,5 +1,5 @@
-const CACHE='gt-bybit-shell-20260923-financial-integrity1';
-const VERSION='20260923-financial-integrity1';
+const CACHE='gt-bybit-shell-20260923-presentation1';
+const VERSION='20260923-presentation1';
 const STATIC=[
   '/gt-bybit/index.html',
   '/gt-bybit/p2p.html',
