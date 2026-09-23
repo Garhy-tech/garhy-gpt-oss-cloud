@@ -1,11 +1,12 @@
 import { validateAction, financialActions } from './validation.js?v=20260908-2';
+import { formatDemoAccountBalance } from './demo-state.js?v=20260923-financial-integrity1';
 
 const API='/api/bybit';
 const VIEW_TITLES={overview:'الرئيسية',trade:'التداول',risk:'إدارة المخاطر',assets:'الأصول والتحويلات',settings:'الإعدادات والأمان'};
 const $=(id)=>document.getElementById(id);
 const $$=(selector)=>[...document.querySelectorAll(selector)];
 const locale=()=>window.GTPreferences?.locale?.() || 'ar-EG';
-const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,accountFrozen:false,frozenBalanceUsd:'3680',pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false,accountSnapshot:null,session:null};
+const state={authenticated:false,csrf:'',generation:0,quote:null,quoteTimer:null,installPrompt:null,region:'—',mutationsEnabled:false,accountFrozen:false,demoMode:false,pending:new Set(),attempts:new Map(),ordersRequest:0,refreshing:false,accountSnapshot:null,session:null};
 const FROZEN_MESSAGE_AR='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
 const FROZEN_MESSAGE_EN='The account is temporarily frozen to protect your assets and account security. We sincerely apologize for the inconvenience. Please contact the support team.';
 const NOTIFICATION_PREF='gt-bybit-notifications';
@@ -20,6 +21,25 @@ function toast(message,kind='info') {
 function setStatus(status,message) { $('serviceStatus').dataset.state=status; $('serviceStatus').querySelector('span:last-child').textContent=message; }
 function frozenMessage(){return window.GTPreferences?.language?.()==='en'?FROZEN_MESSAGE_EN:FROZEN_MESSAGE_AR;}
 function showFrozenNotice(){toast(frozenMessage(),'frozen');}
+const DEMO_MESSAGE_AR='وضع تجريبي — لا يتم تنفيذ أي عمليات مالية حقيقية.';
+const DEMO_MESSAGE_EN='Demo Mode — no real financial operations are executed.';
+function demoMessage(){return window.GTPreferences?.language?.()==='en'?DEMO_MESSAGE_EN:DEMO_MESSAGE_AR;}
+function showDemoNotice(){toast(demoMessage(),'error');}
+function updateFinancialModeUi(){
+  const badge=$('equityModeBadge');
+  if(badge){badge.hidden=!state.demoMode;badge.classList.toggle('hidden',!state.demoMode);}
+}
+function renderDemoFinancialState(){
+  $('mEquity').textContent=formatDemoAccountBalance();
+  $('mWallet').textContent='—';$('mPositions').textContent='—';$('mOrders').textContent='—';
+  $('walletTable').innerHTML='<div class="empty">وضع تجريبي: لا يتم عرض أرصدة Bybit الحية أو محاكاة تفاصيل أصول إضافية.</div>';
+  $('positionsTable').innerHTML='<div class="empty">وضع تجريبي: المراكز الحية غير معروضة.</div>';
+  $('ordersTable').innerHTML='<div class="empty">وضع تجريبي: الأوامر الحية غير معروضة.</div>';
+  $('availableAssets').textContent='وضع تجريبي: بيانات التحويل الحية غير معروضة.';
+  $('settingsAccount').textContent='Demo / Preview';
+  for(const id of ['identityUid','identityKyc','identityRegion','identityMaster','identityParent','identityVip','identityUnified','identityReadOnly'])$(id).textContent='—';
+  updateFinancialModeUi();
+}
 function escapeHtml(value) { return String(value??'').replace(/[&<>'"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 function formatNumber(value,digits=4) {
   if(value === '' || value === undefined || value === null) return '—';
@@ -168,6 +188,7 @@ $('confirmAccept').addEventListener('click',()=>{
 });
 $('confirmCancel').addEventListener('click',()=>$('confirmDialog').close('cancel'));
 async function runMutation(control,input,after=()=>{}) {
+  if(state.demoMode)return showDemoNotice();
   if(state.accountFrozen)return showFrozenNotice();
   if(state.pending.size || !state.authenticated)return;
   state.pending.add('mutation');updateConnectivity();control.setAttribute('aria-busy','true');
@@ -196,12 +217,7 @@ function pnlClass(value) {
 
 function renderWallet(payload) {
   const account = payload?.data?.list?.[0] || {};
-  if(state.accountFrozen){
-    $('mEquity').textContent = `${state.frozenBalanceUsd || '3680'} USD`;
-    $('mWallet').textContent = `${state.frozenBalanceUsd || '3680'} USD`;
-    $('walletTable').innerHTML = '<div class="frozen-wallet-note">الحساب مجمد مؤقتًا. الرصيد المعروض ثابت أثناء فترة التجميد.</div>';
-    return;
-  }
+  if(state.demoMode){renderDemoFinancialState();return;}
   $('mEquity').textContent = `${formatNumber(account.totalEquity, 2)} USD`;
   $('mWallet').textContent = `${formatNumber(account.totalWalletBalance, 2)} USD`;
   const coins = (account.coin || []).filter((coin) => Number(coin.walletBalance || 0) !== 0 || Number(coin.usdValue || 0) !== 0);
@@ -248,12 +264,14 @@ function renderOrders(payload, category) {
 }
 
 async function loadOrders() {
+  if(state.demoMode){$('ordersTable').innerHTML='<div class="empty">وضع تجريبي: الأوامر الحية غير معروضة.</div>';$('mOrders').textContent='—';return;}
   const category=$('ordersCategory').value,request=++state.ordersRequest;
   $('ordersTable').textContent='جارٍ تحميل الأوامر…';
   try {const payload=await apiGet('orders',{category});if(request===state.ordersRequest && state.authenticated)renderOrders(payload,category);}
   catch(error){if(state.authenticated){$('ordersTable').textContent=error.message;$('mOrders').textContent='—';}throw error;}
 }
 async function loadAssets() {
+  if(state.demoMode){$('availableAssets').textContent='وضع تجريبي: بيانات التحويل الحية غير معروضة.';return;}
   $('availableAssets').textContent='جارٍ تحميل العملات المتاحة للتحويل…';
   const form=$('transferForm');
   try { const response=await apiGet('transfer-coins',{fromAccountType:form.elements.fromAccountType.value,toAccountType:form.elements.toAccountType.value});$('availableAssets').textContent=(response.data.list || []).join(' · ') || 'لا توجد عملات متاحة لهذا الاتجاه.'; }
@@ -264,6 +282,13 @@ async function refreshDashboard(showToast=true) {
   state.refreshing=true;$('refreshBtn').disabled=true;
   const epoch=state.generation;
   try {
+    if(state.demoMode){
+      renderDemoFinancialState();
+      state.accountSnapshot={equity:$('mEquity').textContent,positions:'—',orders:'—'};
+      setStatus('ok','وضع تجريبي');
+      if(showToast)toast('تم تثبيت Demo Balance لهذه الجلسة.','success');
+      return;
+    }
     const jobs=[['walletTable',()=>apiGet('wallet'),renderWallet],['positionsTable',()=>apiGet('positions',{category:'linear',settleCoin:'USDT'}),renderPositions],['ordersTable',loadOrders,null],['settingsAccount',()=>apiGet('account'),(result)=>{const mode=result.data.unifiedMarginStatus;$('settingsAccount').textContent=({1:'Classic',3:'UTA 1.0',4:'UTA 1.0 Pro',5:'UTA 2.0',6:'UTA 2.0 Pro'})[mode] || 'غير محدد';}],['identityUid',()=>apiGet('identity'),renderIdentity]];
     const results=await Promise.allSettled(jobs.map(async([id,fetcher,render])=>{try {const result=await fetcher();if(epoch===state.generation && state.authenticated && render)render(result);}catch(error){if(epoch===state.generation && state.authenticated)$(id).textContent=error.message;throw error;}}));
     if(epoch!==state.generation || !state.authenticated)return;
@@ -294,7 +319,7 @@ $('orderForm').addEventListener('change',updateOrderFields);
 $('transferForm').addEventListener('change',()=>{if(state.authenticated)loadAssets();});
 $('convertForm').addEventListener('input',clearQuote);
 $('convertForm').addEventListener('submit',async(event)=>{
-  event.preventDefault();if(state.accountFrozen)return showFrozenNotice();if(state.pending.size)return;clearQuote();state.pending.add('quote');updateConnectivity();
+  event.preventDefault();if(state.demoMode)return showDemoNotice();if(state.accountFrozen)return showFrozenNotice();if(state.pending.size)return;clearQuote();state.pending.add('quote');updateConnectivity();
   try {
     const data=validateAction({action:'convert-quote',...formObject(event.currentTarget)});
     const result=await api('convert-quote',{body:data});state.quote=result.data;
@@ -349,7 +374,7 @@ async function boot(){
   setUnlocked(false);navigate(new URL(location.href).searchParams.get('view'));updateOrderFields();updateNotificationState();
   const results=await Promise.allSettled([api('health',{allowLocked:true}),api('session',{allowLocked:true}),registerServiceWorker(),monitorNotificationPermission()]);
   const health=results[0].status==='fulfilled'?results[0].value:null;
-  if(health){state.region=health.region;state.mutationsEnabled=health.mutationsEnabled;state.accountFrozen=health.accountFrozen===true;state.frozenBalanceUsd=health.frozenBalanceUsd || '3680';$('regionLabel').textContent=state.region;$('settingsRegion').textContent=state.region;$('mutationsState').textContent=state.accountFrozen?'مجمد مؤقتا':state.mutationsEnabled?'مفعّل بتأكيد يدوي':'معطّل';$('preAuthState').textContent=!health.sessionStoreReady?'خدمة الجلسات غير مهيأة':!health.controlReady?'رمز التحكم غير مهيأ':!health.bybitConfigured?'مفاتيح Bybit غير مهيأة':state.accountFrozen?'الحساب مجمد مؤقتا':'جاهز لتسجيل الدخول';setStatus(health.controlReady?'idle':'error',health.controlReady?(state.accountFrozen?'مجمد مؤقتا':'مقفلة'):'الإعداد غير مكتمل');}
+  if(health){state.region=health.region;state.mutationsEnabled=health.mutationsEnabled;state.accountFrozen=health.accountFrozen===true;state.demoMode=health.financialDataMode==='demo';updateFinancialModeUi();$('regionLabel').textContent=state.region;$('settingsRegion').textContent=state.region;$('mutationsState').textContent=state.demoMode?'Demo — معطّل':state.accountFrozen?'مجمد مؤقتا':state.mutationsEnabled?'مفعّل بتأكيد يدوي':'معطّل';$('preAuthState').textContent=!health.sessionStoreReady?'خدمة الجلسات غير مهيأة':!health.controlReady?'رمز التحكم غير مهيأ':!health.bybitConfigured?'مفاتيح Bybit غير مهيأة':state.demoMode?'جاهز للوضع التجريبي':state.accountFrozen?'الحساب مجمد مؤقتا':'جاهز لتسجيل الدخول';setStatus(health.controlReady?'idle':'error',health.controlReady?(state.demoMode?'وضع تجريبي':state.accountFrozen?'مجمد مؤقتا':'مقفلة'):'الإعداد غير مكتمل');}
   else{$('preAuthState').textContent=navigator.onLine?'تعذر الوصول إلى الخدمة':'غير متصل بالإنترنت';setStatus('error','غير متاح');}
   if(results[1].status==='fulfilled' && results[1].value.authenticated)await applySession(results[1].value);
   updateConnectivity();
