@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#06101F" />
   <meta name="color-scheme" content="dark light" />
-  <script src="/gt-bybit/preferences-bootstrap.js?v=20260923-premium2"></script>
+  <script src="/gt-bybit/preferences-bootstrap.js?v=20260923-finops3"></script>
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <meta name="referrer" content="no-referrer" />
   <title>GT.BYBIT · P2P Control</title>
-  <link rel="icon" type="image/webp" sizes="192x192" href="/assets/gt-bybit/brand/gt-app-mark.webp" />
-  <link rel="stylesheet" href="/gt-bybit/p2p-console.css?v=20260923-premium2" />
-  <link rel="stylesheet" href="/gt-bybit/brand.css?v=20260923-premium2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/gt-bybit/brand/gt-logo.png" />
+  <link rel="stylesheet" href="/gt-bybit/p2p-console.css?v=20260923-finops3" />
+  <link rel="stylesheet" href="/gt-bybit/brand.css?v=20260923-finops3" />
 </head>
 <body>
   <div id="offlineBanner" class="offline hidden">أنت غير متصل بالإنترنت — جميع عمليات P2P متوقفة.</div>
 
   <header class="topbar">
     <div class="brand">
-      <img src="/assets/gt-bybit/brand/gt-primary.webp" alt="" />
+      <img src="/assets/gt-bybit/brand/gt-logo.png" alt="" />
       <div><strong>GT.BYBIT</strong><small>P2P CONTROL · GARHY TECH</small></div>
     </div>
     <div class="top-actions">
@@ -39,7 +39,7 @@
         <button id="connectBtn" class="btn primary" type="button">فتح جلسة P2P</button>
       </div>
       <div class="security-line">Control Token يبقى في ذاكرة الصفحة فقط ولا يوجد قفل تلقائي بمرور الوقت. تنتهي الجلسة عند تسجيل الخروج أو إغلاق/تحديث الصفحة.</div>
-      <div class="corporate-endorsement"><img src="/assets/gt-bybit/brand/garhy-tech-signature.webp" alt="GARHY TECH · Founder Office" /></div>
+      <div class="corporate-endorsement"><strong>GARHY TECH</strong><span>GT.BYBIT · Financial Operations</span></div>
     </section>
 
     <section id="console" class="hidden">
@@ -78,6 +78,22 @@
           <div><strong>Browser Notifications</strong><span>ينبهك عند ظهور طلب Pending جديد بعد السماح بالإشعارات.</span></div>
           <div><strong>Financial Guard</strong><span>Release وMark as Paid يحتاجان تأكيدًا يدويًا صريحًا في كل مرة.</span></div>
         </div>
+      </section>
+
+      <section class="card market-monitor">
+        <div class="card-head">
+          <div><h2>مراقب ترتيب الإعلان</h2><p>يراقب أول منافس غير معلّم كترويجي ويقترح سعرًا أقل بـ 0.01 فقط.</p></div>
+          <button id="monitorRefresh" class="mini" type="button">تحديث السوق</button>
+        </div>
+        <div class="monitor-controls"><label><span>الإعلان المراقب</span><select id="monitorAdSelect" aria-label="الإعلان المراقب"></select></label></div>
+        <div class="monitor-metrics">
+          <div><span>سعرك الحالي</span><strong id="monitorCurrentPrice">—</strong></div>
+          <div><span>أول منافس غير ترويجي</span><strong id="monitorCompetitorPrice">—</strong></div>
+          <div><span>السعر المقترح</span><strong id="monitorTargetPrice">—</strong></div>
+        </div>
+        <div id="monitorStatus" class="monitor-note" role="status">بانتظار بيانات السوق.</div>
+        <div class="monitor-actions"><button id="applyTargetBtn" class="btn primary" type="button" disabled>مراجعة تحديث السعر</button></div>
+        <p class="guard-note">المراقبة آلية، أما تعديل السعر الحقيقي فلا يتم تلقائيًا: REVIEW → CONFIRM → EXECUTE.</p>
       </section>
 
       <section class="grid two">
@@ -148,7 +164,8 @@
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/gt-bybit/preferences.js?v=20260923-premium2"></script>
-  <script src="/gt-bybit/p2p-console.js?v=20260923-premium2" defer></script>
+  <script src="/gt-bybit/preferences.js?v=20260923-finops3"></script>
+  <script src="/gt-bybit/receipts.js?v=20260923-finops3"></script>
+  <script src="/gt-bybit/p2p-console.js?v=20260923-finops3" defer></script>
 </body>
 </html>

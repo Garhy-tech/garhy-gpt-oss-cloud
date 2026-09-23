@@ -40,7 +40,7 @@ function updateNotificationState(){
 async function notify(title,body,tag){
   if(!notificationsEnabled())return;
   const registration=await navigator.serviceWorker?.ready.catch(()=>null);
-  if(registration)await registration.showNotification(title,{body,tag,icon:'/assets/gt-bybit/icon-192.png',badge:'/assets/gt-bybit/icon-192.png',dir:window.GTPreferences?.dir?.() || 'rtl',lang:window.GTPreferences?.language?.() || 'ar',renotify:false,data:{url:'/'}});
+  if(registration)await registration.showNotification(title,{body,tag,icon:'/assets/gt-bybit/brand/gt-logo.png',badge:'/assets/gt-bybit/brand/gt-logo.png',dir:window.GTPreferences?.dir?.() || 'rtl',lang:window.GTPreferences?.language?.() || 'ar',renotify:false,data:{url:'/'}});
 }
 async function toggleNotifications(){
   if(notificationsEnabled()){
@@ -174,10 +174,11 @@ async function runMutation(control,input,after=()=>{}) {
     if(!state.authenticated || !navigator.onLine)throw new Error('تغيرت حالة الاتصال أو الجلسة.');
     const fingerprint=JSON.stringify(data);
     const requestId=state.attempts.get(fingerprint) || crypto.randomUUID();state.attempts.set(fingerprint,requestId);
-    await api(data.action,{body:{...data,confirmed:true,requestId}});
+    const response=await api(data.action,{body:{...data,confirmed:true,requestId}});
     state.attempts.delete(fingerprint);
+    window.GTReceipts?.present(response.receipt);
     if(data.action==='convert-confirm')clearQuote();
-    toast('استلمت Bybit الطلب. تحقّق من حالته النهائية في سجل الحساب.','success');await notify('GT.BYBIT','استلمت Bybit طلب العملية بعد تأكيدك. راجع سجل الحساب للحالة النهائية.',`gt-bybit-${data.action}`);
+    toast('استلمت Bybit الطلب وتم إنشاء إيصال PDF. تحقّق من حالته النهائية في سجل الحساب.','success');await notify('GT.BYBIT','استلمت Bybit طلب العملية بعد تأكيدك. راجع سجل الحساب للحالة النهائية.',`gt-bybit-${data.action}`);
     try {await after();} catch {toast('قُبل الطلب، لكن تعذر تحديث البيانات. حدّثها يدويًا.');}
   } catch(error){toast(error.message,'error');}
   finally{state.pending.delete('mutation');control.removeAttribute('aria-busy');updateConnectivity();}
