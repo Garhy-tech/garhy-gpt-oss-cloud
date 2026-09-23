@@ -44,13 +44,20 @@ test('mutations require cookie, same origin, CSRF, explicit confirmation and req
   assert.equal(s.calls.length,0);
 });
 
-test('production uses live Bybit financial data and does not auto-freeze the account',async()=>{
-  const env={...fixtureEnv(),VERCEL_ENV:'production'};
+test('production verifies live Bybit connectivity, enables guarded mutations, and keeps reads live',async()=>{
+  const env={...fixtureEnv(),VERCEL_ENV:'production',BYBIT_ENABLE_MUTATIONS:'false'};
   const s=await setup({env});
   const health=await invoke(s.handler,{query:{action:'health'}});
   assert.equal(health.statusCode,200);
   assert.equal(health.body.accountFrozen,false);
   assert.equal(health.body.financialDataMode,'live');
+  assert.equal(health.body.liveConnectivity,'VERIFIED');
+  assert.ok(Number.isFinite(health.body.liveConnectivityCheckedAt));
+  assert.equal(health.body.mutationsEnabled,true);
+
+  const cachedHealth=await invoke(s.handler,{query:{action:'health'}});
+  assert.equal(cachedHealth.body.liveConnectivity,'VERIFIED');
+  assert.equal(s.calls.filter((call)=>call.method==='GET' && call.path==='/v5/account/info').length,1);
 
   const wallet=await invoke(s.handler,{query:{action:'wallet'},cookie:s.cookie});
   assert.equal(wallet.statusCode,200);
@@ -63,6 +70,7 @@ test('explicit production freeze still blocks financial mutations before Bybit',
   const health=await invoke(s.handler,{query:{action:'health'}});
   assert.equal(health.body.accountFrozen,true);
   assert.equal(health.body.financialDataMode,'live');
+  assert.equal(health.body.mutationsEnabled,false);
 
   const mutation=await invoke(s.handler,{method:'POST',body:money(order),cookie:s.cookie,csrf:s.csrf});
   assert.equal(mutation.statusCode,423);
@@ -124,7 +132,7 @@ test('timeout cannot cause an automatic or duplicate money request',async()=>{
   const s=await setup({request:async(...args)=>{if(args[0]==='POST'){writes++;throw new AppError('UPSTREAM_TIMEOUT','timeout',504);}return base(...args);}});
   const opts={method:'POST',body:money(order),cookie:s.cookie,csrf:s.csrf};assert.equal((await invoke(s.handler,opts)).statusCode,504);assert.equal((await invoke(s.handler,opts)).statusCode,409);assert.equal(writes,1);
 });
-test('financial kill switch blocks all account changes',async()=>{
+test('non-production financial kill switch blocks all account changes',async()=>{
   const s=await setup();s.env.BYBIT_ENABLE_MUTATIONS='false';
   assert.equal((await invoke(s.handler,{method:'POST',body:money(order),cookie:s.cookie,csrf:s.csrf})).body.error,'MUTATIONS_DISABLED');assert.equal(s.calls.length,0);
 });

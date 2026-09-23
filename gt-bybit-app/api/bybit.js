@@ -9,7 +9,34 @@ import { isDemoFinancialMode } from '../gt-bybit/demo-state.js';
 const MAX_BODY = 16 * 1024;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FROZEN_MESSAGE='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
+const LIVE_PROBE_KEY='gt:bybit:live-connectivity:v1';
+const LIVE_PROBE_TTL_SECONDS=300;
+const LIVE_PROBE_FAILURE_TTL_SECONDS=30;
 function accountFrozen(env){return env.GT_ACCOUNT_FROZEN==='true';}
+function mutationsEnabled(env){
+  return !accountFrozen(env) && (env.VERCEL_ENV==='production' || env.BYBIT_ENABLE_MUTATIONS==='true');
+}
+async function probeLiveConnectivity({env,store,request,now,storageReady,bybitConfigured}){
+  if(env.VERCEL_ENV!=='production' || !bybitConfigured || !storageReady()) return {state:'UNTESTED',checkedAt:null};
+  let cached;
+  try { cached=await store.get(LIVE_PROBE_KEY); } catch { return {state:'UNTESTED',checkedAt:null}; }
+  if(cached && ['VERIFIED','FAILED'].includes(cached.state)) return cached;
+  const lockKey=`${LIVE_PROBE_KEY}:lock`;
+  let acquired=false;
+  try { acquired=await store.set(lockKey,{checkedAt:now()},10,true); } catch { return {state:'UNTESTED',checkedAt:null}; }
+  if(!acquired) return {state:'CHECKING',checkedAt:null};
+  let probe;
+  try {
+    await request('GET','/v5/account/info',{});
+    probe={state:'VERIFIED',checkedAt:now()};
+    try { await store.set(LIVE_PROBE_KEY,probe,LIVE_PROBE_TTL_SECONDS); } catch { /* status remains verified for this request */ }
+  } catch {
+    probe={state:'FAILED',checkedAt:now()};
+    try { await store.set(LIVE_PROBE_KEY,probe,LIVE_PROBE_FAILURE_TTL_SECONDS); } catch { /* do not expose upstream details */ }
+  }
+  try { await store.delete(lockKey); } catch { /* lock expires automatically */ }
+  return probe;
+}
 const POST_PATHS = {
   'place-order':'/v5/order/create', 'cancel-order':'/v5/order/cancel', 'cancel-all':'/v5/order/cancel-all',
   'set-leverage':'/v5/position/set-leverage', 'set-trading-stop':'/v5/position/trading-stop',
@@ -108,7 +135,8 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     if (action === 'health') {
       let bybitConfigured = false;
       try { getBybitConfig(env); bybitConfigured = true; } catch { /* report only readiness */ }
-      return send(res,200,{ok:true,service:'gt-bybit-v5',version:'2.0.0',region:env.VERCEL_REGION || 'local',controlReady:isControlConfigured(env) && storageReady(),bybitConfigured,sessionStoreReady:storageReady(),liveConnectivity:'UNTESTED',mutationsEnabled:env.BYBIT_ENABLE_MUTATIONS === 'true',accountFrozen:accountFrozen(env),frozenMessage:accountFrozen(env)?FROZEN_MESSAGE:null,financialDataMode:isDemoFinancialMode(env)?'presentation':'live',absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false});
+      const liveProbe=await probeLiveConnectivity({env,store,request,now,storageReady,bybitConfigured});
+      return send(res,200,{ok:true,service:'gt-bybit-v5',version:'2.0.0',region:env.VERCEL_REGION || 'local',controlReady:isControlConfigured(env) && storageReady(),bybitConfigured,sessionStoreReady:storageReady(),liveConnectivity:liveProbe.state,liveConnectivityCheckedAt:liveProbe.checkedAt,mutationsEnabled:mutationsEnabled(env),accountFrozen:accountFrozen(env),frozenMessage:accountFrozen(env)?FROZEN_MESSAGE:null,financialDataMode:isDemoFinancialMode(env)?'presentation':'live',absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false});
     }
     assert(!req.headers['sec-fetch-site'] || req.headers['sec-fetch-site'] === 'same-origin', 'ORIGIN_DENIED', 'مصدر الطلب غير مصرح به.', 403);
     const session = await sessions.authenticate(req,action !== 'session');
@@ -169,7 +197,7 @@ export function createHandler({ env = process.env, store = createRedisStore({env
       return send(res,200,{ok:true,data:{...quote,expiredTime:String(expiresAt)}});
     }
     assert(financialActions.includes(action),'UNKNOWN_ACTION','العملية غير مدعومة.',404);
-    assert(env.BYBIT_ENABLE_MUTATIONS === 'true','MUTATIONS_DISABLED','تنفيذ العمليات المالية معطّل في إعدادات الخادم.',403);
+    assert(mutationsEnabled(env),'MUTATIONS_DISABLED','تنفيذ العمليات المالية معطّل في إعدادات الخادم.',403);
     assert(body.confirmed === true,'CONFIRMATION_REQUIRED','يجب مراجعة تفاصيل العملية وتأكيدها صراحةً.');
     assert(typeof body.requestId === 'string' && UUID.test(body.requestId),'INVALID_REQUEST_ID','معرّف العملية غير صالح.');
     const key=`${session.namespace}:operation:${body.requestId}`;
