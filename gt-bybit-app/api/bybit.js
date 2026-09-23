@@ -9,7 +9,7 @@ import { isDemoFinancialMode } from '../gt-bybit/demo-state.js';
 const MAX_BODY = 16 * 1024;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FROZEN_MESSAGE='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
-function accountFrozen(env){return env.GT_ACCOUNT_FROZEN==='true' || env.VERCEL_ENV==='production';}
+function accountFrozen(env){return env.GT_ACCOUNT_FROZEN==='true';}
 const POST_PATHS = {
   'place-order':'/v5/order/create', 'cancel-order':'/v5/order/cancel', 'cancel-all':'/v5/order/cancel-all',
   'set-leverage':'/v5/position/set-leverage', 'set-trading-stop':'/v5/position/trading-stop',
