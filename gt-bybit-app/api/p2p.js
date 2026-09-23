@@ -2,6 +2,7 @@ import { BybitError, bybitRequest } from '../lib/bybit.js';
 import { requireBybitControl } from '../lib/bybit-control.js';
 import { createReceipt } from '../lib/receipts.js';
 import { selectFirstNonPromotedCompetitor, subtractDecimal, summarizeAd } from '../lib/p2p-pricing.js';
+import { isDemoFinancialMode } from '../gt-bybit/demo-state.js';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FROZEN_MESSAGE='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
@@ -105,6 +106,7 @@ function adId(ad = {}) {
 }
 
 function requireMutationReview(body, expectedConfirm) {
+  if (isDemoFinancialMode(process.env)) fail(403, 'DEMO_MODE_MUTATION_BLOCKED', 'Demo mode never executes real P2P financial operations');
   if (accountFrozen()) fail(423, 'ACCOUNT_FROZEN', FROZEN_MESSAGE);
   if (process.env.BYBIT_ENABLE_MUTATIONS !== 'true') fail(403, 'MUTATIONS_DISABLED', 'P2P mutations are disabled by server configuration');
   if (body.confirm !== expectedConfirm) fail(400, 'CONFIRMATION_REQUIRED', `action requires confirm=${expectedConfirm}`);
@@ -127,6 +129,22 @@ async function handle(req, res) {
   const body = bodyOf(req);
   const action = text(body.action, 'action', 80).toLowerCase();
 
+  if (isDemoFinancialMode(process.env)) {
+    if (action === 'status' || action === 'user-info') {
+      return send(res, 200, {
+        ok: true,
+        available: true,
+        service: 'bybit-p2p-v5',
+        data: {},
+        accountFrozen: false,
+        financialDataMode: 'demo',
+        frozenMessage: null,
+        timestamp: Date.now(),
+      });
+    }
+    fail(403, 'DEMO_MODE_LIVE_DATA_BLOCKED', 'Demo mode does not read or mutate live P2P financial data');
+  }
+
   if (action === 'status' || action === 'user-info') {
     const data = await p2p('/v5/p2p/user/personal/info', {});
     return send(res, 200, {
@@ -135,6 +153,7 @@ async function handle(req, res) {
       service: 'bybit-p2p-v5',
       data: data.result,
       accountFrozen: accountFrozen(),
+      financialDataMode: isDemoFinancialMode(process.env) ? 'demo' : 'live',
       frozenMessage: accountFrozen() ? FROZEN_MESSAGE : null,
       timestamp: Date.now(),
     });

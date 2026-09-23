@@ -41,7 +41,7 @@ assert.equal(manifest.display,'standalone');
 assert.equal(config.rewrites.find((r)=>r.source==='/').destination,'/gt-bybit/index.html');
 assert.equal(config.outputDirectory,'public');
 
-for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','gt-logo.png','gt-watermark.webp']) {
+for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','demo-state.js','gt-logo.png','gt-watermark.webp']) {
   assert.ok(worker.includes(dependency),`Service worker must include ${dependency}`);
 }
 assert.doesNotMatch(worker,/icon-(?:180|192|512)|gt-profile|gt-primary|gt-app-mark|garhy-tech-signature/);

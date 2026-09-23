@@ -21,9 +21,10 @@ test('service worker purges only old GT.BYBIT caches and claims clients',async()
   const w=worker();let pending;w.handlers.activate({waitUntil(promise){pending=promise;}});await pending;assert.deepEqual(w.deleted,['gt-bybit-shell-v3','gt-bybit-shell-20260908-2','gt-bybit-shell-20260910-3','gt-bybit-shell-20260910-4','gt-bybit-shell-20260910-5','gt-bybit-shell-20260910-6','gt-bybit-shell-20260910-7','gt-bybit-shell-20260910-8','gt-bybit-shell-20260910-9','gt-bybit-shell-20260910-10']);assert.equal(w.claimed,true);
 });
 
-test('service worker caches preference runtime dependencies',()=>{
+test('service worker caches preference and demo runtime dependencies',()=>{
   assert.match(source,/preferences-bootstrap\.js/);
   assert.match(source,/preferences\.js/);
+  assert.match(source,/demo-state\.js/);
 });
 
 test('service worker caches P2P shell, receipts, logo and watermark only',()=>{
