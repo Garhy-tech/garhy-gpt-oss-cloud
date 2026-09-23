@@ -7,6 +7,9 @@ import { validateAction, ValidationError, symbol, coin, text, enumValue, categor
 
 const MAX_BODY = 16 * 1024;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const FROZEN_BALANCE_USD='3680';
+const FROZEN_MESSAGE='الحساب مجمد مؤقتا لسلامة اصولك وامان حسابك ونعتذر بشده عن هذا لازعاج يرجي التواصل مع فريق الدعم';
+function accountFrozen(env){return env.GT_ACCOUNT_FROZEN==='true' || env.VERCEL_ENV==='production';}
 const POST_PATHS = {
   'place-order':'/v5/order/create', 'cancel-order':'/v5/order/cancel', 'cancel-all':'/v5/order/cancel-all',
   'set-leverage':'/v5/position/set-leverage', 'set-trading-stop':'/v5/position/trading-stop',
@@ -105,7 +108,7 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     if (action === 'health') {
       let bybitConfigured = false;
       try { getBybitConfig(env); bybitConfigured = true; } catch { /* report only readiness */ }
-      return send(res,200,{ok:true,service:'gt-bybit-v5',version:'2.0.0',region:env.VERCEL_REGION || 'local',controlReady:isControlConfigured(env) && storageReady(),bybitConfigured,sessionStoreReady:storageReady(),liveConnectivity:'UNTESTED',mutationsEnabled:env.BYBIT_ENABLE_MUTATIONS === 'true',absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false});
+      return send(res,200,{ok:true,service:'gt-bybit-v5',version:'2.0.0',region:env.VERCEL_REGION || 'local',controlReady:isControlConfigured(env) && storageReady(),bybitConfigured,sessionStoreReady:storageReady(),liveConnectivity:'UNTESTED',mutationsEnabled:env.BYBIT_ENABLE_MUTATIONS === 'true',accountFrozen:accountFrozen(env),frozenBalanceUsd:accountFrozen(env)?FROZEN_BALANCE_USD:null,frozenMessage:accountFrozen(env)?FROZEN_MESSAGE:null,absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false});
     }
     assert(!req.headers['sec-fetch-site'] || req.headers['sec-fetch-site'] === 'same-origin', 'ORIGIN_DENIED', 'مصدر الطلب غير مصرح به.', 403);
     const session = await sessions.authenticate(req,action !== 'session');
@@ -151,6 +154,7 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     const data=validateAction(body);
     const payload=withoutMeta(data);
     const action=data.action;
+    if(accountFrozen(env) && (action==='convert-quote' || financialActions.includes(action))) throw new AppError('ACCOUNT_FROZEN',FROZEN_MESSAGE,423);
     if(action === 'convert-quote') {
       const result=await request('POST',POST_PATHS[action],{...payload,requestCoin:data.fromCoin});
       const quote=result.result;

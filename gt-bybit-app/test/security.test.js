@@ -43,6 +43,24 @@ test('mutations require cookie, same origin, CSRF, explicit confirmation and req
   ])assert.ok((await invoke(s.handler,{method:'POST',...options})).statusCode>=400);
   assert.equal(s.calls.length,0);
 });
+
+test('production frozen-account mode exposes 3680 USD snapshot and blocks money actions before Bybit',async()=>{
+  const env={...fixtureEnv(),VERCEL_ENV:'production'};
+  const s=await setup({env});
+  const health=await invoke(s.handler,{query:{action:'health'}});
+  assert.equal(health.statusCode,200);
+  assert.equal(health.body.accountFrozen,true);
+  assert.equal(health.body.frozenBalanceUsd,'3680');
+
+  const quote=await invoke(s.handler,{method:'POST',body:{action:'convert-quote',fromCoin:'USDT',toCoin:'USDC',requestAmount:'10',accountType:'eb_convert_uta'},cookie:s.cookie,csrf:s.csrf});
+  assert.equal(quote.statusCode,423);
+  assert.equal(quote.body.error,'ACCOUNT_FROZEN');
+
+  const mutation=await invoke(s.handler,{method:'POST',body:money(order),cookie:s.cookie,csrf:s.csrf});
+  assert.equal(mutation.statusCode,423);
+  assert.equal(mutation.body.error,'ACCOUNT_FROZEN');
+  assert.equal(s.calls.length,0);
+});
 test('method, JSON, content type, payload size and secret query guards reject before Bybit',async()=>{
   const s=await setup();
   const cases=[{method:'DELETE'},{method:'POST',body:'{'},{method:'POST',body:[]},{method:'POST',body:{action:'login'},headers:{'content-type':'text/plain'}},{method:'POST',body:{action:'login',extra:'x'.repeat(17000)}},{query:{action:'health',token:'not-allowed'}},{query:{action:['wallet','health']}}];
