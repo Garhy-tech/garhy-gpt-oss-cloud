@@ -113,6 +113,9 @@ export function createHandler({ env = process.env, store = createRedisStore({env
     assert(!req.headers['sec-fetch-site'] || req.headers['sec-fetch-site'] === 'same-origin', 'ORIGIN_DENIED', 'مصدر الطلب غير مصرح به.', 403);
     const session = await sessions.authenticate(req,action !== 'session');
     if (action === 'session') return send(res,200,session ? {ok:true,authenticated:true,csrfToken:session.csrf,expiresAt:session.expiresAt,absoluteLifetimeDays:sessionLifetime(env)/86400,idleTimeout:false} : {ok:true,authenticated:false});
+    if (isDemoFinancialMode(env) && ['wallet','positions','orders','order-history','executions','assets','transfer-coins','transfers','convert-history','convert-status'].includes(action)) {
+      throw new AppError('DEMO_MODE_LIVE_DATA_BLOCKED','الوضع التجريبي لا يقرأ البيانات المالية الحية من Bybit.',403);
+    }
     await sessions.rateLimit(`read:${session.owner}`,120);
     let path, params = {};
     if (action === 'identity') path = '/v5/user/query-api';
