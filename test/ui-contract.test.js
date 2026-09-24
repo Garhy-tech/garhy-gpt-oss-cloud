@@ -1,71 +1,56 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
-const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
-const copySource = app.slice(app.indexOf('const copy'), app.indexOf('const state'));
+const rootIndex = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const gtBybitCompat = readFileSync(new URL('../gt-bybit/index.html', import.meta.url), 'utf8');
+const gtBybitIndex = readFileSync(new URL('../gt-bybit-app/gt-bybit/index.html', import.meta.url), 'utf8');
+const gtBybitApp = readFileSync(new URL('../gt-bybit-app/gt-bybit/app.js', import.meta.url), 'utf8');
+const hanaIndex = readFileSync(new URL('../hana-ai-pro/index.html', import.meta.url), 'utf8');
 
-test('the public interface preserves Hana as the product identity', () => {
-  assert.match(index, /<title>Hana GARHY TECH<\/title>/);
-  assert.match(index, /مرحبا أنا Hana المساعدة الذكية من GARHY TECH/);
-  assert.doesNotMatch(index + app, /هانا|جارهي\s*تك/i);
-  assert.doesNotMatch(index, /GROQ_API_KEY|Groq Cloud API|Environment Variable/i);
+test('repository root and compatibility route forward to the canonical GT.BYBIT app', () => {
+  assert.match(rootIndex, /<title>GT\.BYBIT<\/title>/);
+  assert.match(rootIndex, /noindex,nofollow,noarchive/);
+  assert.match(rootIndex, /location\.replace\('\/gt-bybit\/'\)/);
+
+  assert.match(gtBybitCompat, /<title>GT\.BYBIT<\/title>/);
+  assert.match(gtBybitCompat, /noindex,nofollow,noarchive/);
+  assert.match(gtBybitCompat, /location\.replace\('\/gt-bybit-app\/gt-bybit\/'\)/);
 });
 
-test('the interface exposes branded metadata and PWA assets', () => {
-  assert.match(index, /rel="manifest" href="\/manifest\.webmanifest"/);
-  assert.match(index, /property="og:image" content="https:\/\/garhy-gpt-oss-cloud\.vercel\.app\/assets\/og-hana\.jpg"/);
-  assert.equal(existsSync(new URL('../assets/og-hana.jpg', import.meta.url)), true);
-  assert.equal(existsSync(new URL('../assets/icon-512.webp', import.meta.url)), true);
-  assert.equal(existsSync(new URL('../manifest.webmanifest', import.meta.url)), true);
-  assert.equal(existsSync(new URL('../assets/brand/gt-lion-logo.webp', import.meta.url)), true);
+test('the canonical GT.BYBIT interface preserves secure control and confirmation surfaces', () => {
+  assert.match(gtBybitIndex, /<title>GT\.BYBIT<\/title>/);
+  assert.match(gtBybitIndex, /GARHY TECH/);
+  assert.match(gtBybitIndex, /id="authGate"/);
+  assert.match(gtBybitIndex, /id="controlToken"/);
+  assert.match(gtBybitIndex, /id="secureApp"/);
+  assert.match(gtBybitIndex, /id="sessionClock"/);
+  assert.match(gtBybitIndex, /id="notificationBtn"/);
+  assert.match(gtBybitIndex, /id="confirmDialog"/);
+  assert.match(gtBybitIndex, /id="confirmationTyped"/);
+  assert.match(gtBybitIndex, /id="confirmAccept"/);
+  assert.match(gtBybitApp, /credentials:\s*['"]same-origin['"]/);
 });
 
-test('the visible copy dictionary is punctuation free', () => {
-  const values = [...copySource.matchAll(/^\s+\w+: '([^']*)',?$/gm)].map((match) => match[1]);
-  assert.ok(values.length > 100);
-  for (const value of values) assert.doesNotMatch(value, /[،؛؟!.,·—:]/);
+test('the canonical GT.BYBIT interface remains private from search indexing', () => {
+  assert.match(gtBybitIndex, /noindex,nofollow,noarchive/);
+  assert.match(gtBybitIndex, /rel="manifest"/);
+  assert.match(gtBybitIndex, /dir="rtl"/);
 });
 
-test('the media rail includes nine distinct optimized editorial assets', () => {
-  for (const file of ['01-6713', '02-6754', '03-6743', '04-6750', '05-6756', '06-6761', '07-6762', '08-6763', '09-6733']) {
-    assert.equal(index.includes('/assets/media/' + file + '-640.webp'), true);
-    assert.equal(existsSync(new URL('../assets/media/' + file + '-640.webp', import.meta.url)), true);
-    assert.equal(existsSync(new URL('../assets/media/' + file + '-960.webp', import.meta.url)), true);
-  }
-  const rail = index.match(/<ul id="mediaTrack"[^>]*>([\s\S]*?)<\/ul>/)[1];
-  const sources = [...rail.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)].map((match) => match[1]);
-  assert.equal(sources.length, 9);
-  const hashes = sources.map((src) => createHash('sha256')
-    .update(readFileSync(new URL('..' + src, import.meta.url))).digest('hex'));
-  assert.equal(new Set(hashes).size, sources.length, 'Each source slide must show a distinct image');
-  assert.equal(app.includes('cloneNode(true)'), true);
-  assert.equal(app.includes('translate3d'), true);
-  assert.equal(app.includes('prefers-reduced-motion'), true);
+test('Hana AI Pro preserves its current production identity and public metadata', () => {
+  assert.match(hanaIndex, /<title>Hana AI Pro — Professional Engineering AI by GARHY TECH<\/title>/);
+  assert.match(hanaIndex, /rel="canonical" href="https:\/\/garhy\.ai\/" \/>/);
+  assert.match(hanaIndex, /property="og:title" content="Hana AI Pro — GARHY TECH"/);
+  assert.match(hanaIndex, /rel="manifest" href="\/manifest\.webmanifest"/);
+  assert.match(hanaIndex, /class="skip-link"/);
+  assert.match(hanaIndex, /id="chatForm"/);
+  assert.match(hanaIndex, /id="auditForm"/);
+  assert.match(hanaIndex, /id="accountDialog"/);
 });
 
-test('the advanced controls preserve the backend model and reasoning contract', () => {
-  assert.match(index, /value="openai\/gpt-oss-20b"/);
-  assert.match(index, /value="openai\/gpt-oss-120b"/);
-  assert.match(index, /value="low"/);
-  assert.match(index, /value="medium"/);
-  assert.match(index, /value="high"/);
-  assert.match(app, /credentials: 'same-origin'/);
-});
-
-test('conversation starters populate the accessible composer', () => {
-  assert.match(index, /data-prompt-key="suggestion_one"/);
-  assert.match(app, /document\.querySelectorAll\('\[data-prompt-key\]'\)\.forEach/);
-  assert.match(app, /elements\.prompt\.value = text\(button\.dataset\.promptKey\)/);
-});
-
-test('music and haptic controls are built into the interface', () => {
-  assert.match(index, /id="musicToggle"/);
-  assert.match(index, /id="hanaAudio" preload="none" loop/);
-  assert.match(index, /assets\/brand\/gt-lion-logo\.webp/);
-  assert.match(app, /elements\.audio\.play\(\)/);
-  assert.match(app, /navigator\.vibrate\(duration\)/);
-  assert.equal(existsSync(new URL('../assets/audio/hana-theme.mp3', import.meta.url)), true);
+test('Hana AI Pro public page remains indexable while auth/control routes use explicit app protections', () => {
+  assert.match(hanaIndex, /name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/);
+  assert.match(hanaIndex, /aria-live="polite"/);
+  assert.match(hanaIndex, /aria-busy="false"/);
 });
