@@ -35,6 +35,7 @@ assert.equal(manifest.start_url,'/');
 assert.equal(manifest.scope,'/');
 assert.equal(manifest.display,'standalone');
 assert.equal(config.rewrites.find((r)=>r.source==='/').destination,'/gt-bybit/index.html');
+assert.match(config.headers.find((rule)=>rule.source==='/(.*)').headers.find((header)=>header.key==='Content-Security-Policy').value,/\bimg-src 'self'/);
 assert.equal(config.outputDirectory,'public');
 
 for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','demo-state.js']) {

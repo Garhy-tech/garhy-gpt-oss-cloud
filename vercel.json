@@ -18,6 +18,10 @@
     {
       "source": "/gt-bybit/:path*",
       "destination": "/gt-bybit-app/gt-bybit/:path*"
+    },
+    {
+      "source": "/assets/gt-crypto/:path*",
+      "destination": "/gt-bybit-app/assets/gt-crypto/:path*"
     }
   ],
   "headers": [

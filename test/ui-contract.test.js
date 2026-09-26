@@ -14,6 +14,7 @@ test('repository root and GT CRYPTO APIs route forward to the canonical app with
   assert.match(rootIndex, /location\.replace\('\/gt-bybit\/'\)/);
 
   assert.equal(routing.rewrites.find((rule) => rule.source === '/gt-bybit/:path*')?.destination, '/gt-bybit-app/gt-bybit/:path*');
+  assert.equal(routing.rewrites.find((rule) => rule.source === '/assets/gt-crypto/:path*')?.destination, '/gt-bybit-app/assets/gt-crypto/:path*');
   for (const path of ['gt-bybit', 'assets/gt-bybit', 'bybit.html', 'bybit-dashboard.css', 'bybit-dashboard.js']) {
     assert.equal(existsSync(new URL(`../${path}`, import.meta.url)), false, `${path} must remain removed`);
   }
