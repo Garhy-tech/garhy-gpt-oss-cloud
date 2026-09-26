@@ -331,6 +331,7 @@ function logout(message = 'تم تسجيل الخروج ومسح Control Token �
   initializedPendingSnapshot = false;
   stopPolling();
   $('controlToken').value = '';
+  concealToken();loginFeedback();
   $('console').classList.add('hidden');
   $('authGate').classList.remove('hidden');
   setState('idle', 'مقفلة');
@@ -339,7 +340,8 @@ function logout(message = 'تم تسجيل الخروج ومسح Control Token �
 
 async function connect() {
   const token = $('controlToken').value.trim();
-  if (!token) return toast('أدخل Control Token أولًا.', 'error');
+  if (!token) { loginFeedback('أدخل رمز التحكم أولًا.'); $('controlToken').focus(); return; }
+  loginFeedback();concealToken();
   controlToken = token;
   $('connectBtn').disabled = true;
   $('connectBtn').textContent = 'جارٍ التحقق…';
@@ -353,7 +355,8 @@ async function connect() {
     if (error.status === 401) {
       controlToken = '';
       setState('error', 'Token غير صحيح');
-      toast('Control Token غير صحيح.', 'error');
+      loginFeedback('رمز التحكم غير صحيح. تحقق منه وحاول مجددًا.');
+      $('controlToken').focus();
     } else {
       $('controlToken').value = '';
       unlock();
@@ -365,6 +368,25 @@ async function connect() {
   }
 }
 
+function loginFeedback(message = '') {
+  $('loginFeedback').textContent = message;
+  $('loginFeedback').hidden = !message;
+  $('controlToken').setAttribute('aria-invalid', String(Boolean(message)));
+}
+function concealToken() {
+  $('controlToken').type = 'password';
+  $('toggleToken').textContent = 'إظهار';
+  $('toggleToken').setAttribute('aria-label', 'إظهار رمز التحكم');
+  $('toggleToken').setAttribute('aria-pressed', 'false');
+}
+$('toggleToken').addEventListener('click', () => {
+  const shown = $('controlToken').type === 'password';
+  $('controlToken').type = shown ? 'text' : 'password';
+  $('toggleToken').textContent = shown ? 'إخفاء' : 'إظهار';
+  $('toggleToken').setAttribute('aria-label', shown ? 'إخفاء رمز التحكم' : 'إظهار رمز التحكم');
+  $('toggleToken').setAttribute('aria-pressed', String(shown));
+});
+$('controlToken').addEventListener('input', () => loginFeedback());
 $('connectBtn').addEventListener('click', connect);
 $('controlToken').addEventListener('keydown', (event) => { if (event.key === 'Enter') connect(); });
 $('logoutBtn').addEventListener('click', () => logout());
