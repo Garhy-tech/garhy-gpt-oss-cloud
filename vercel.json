@@ -18,14 +18,6 @@
     {
       "source": "/gt-bybit/:path*",
       "destination": "/gt-bybit-app/gt-bybit/:path*"
-    },
-    {
-      "source": "/assets/gt-bybit/icon-512.png",
-      "destination": "/gt-bybit-app/assets/gt-bybit/icon-512.webp"
-    },
-    {
-      "source": "/assets/gt-bybit/:path*",
-      "destination": "/gt-bybit-app/assets/gt-bybit/:path*"
     }
   ],
   "headers": [
