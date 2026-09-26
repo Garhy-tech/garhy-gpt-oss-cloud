@@ -7,7 +7,7 @@
         android:fullBackupContent="false"
         android:icon="@drawable/gt_icon"
         android:roundIcon="@drawable/gt_icon"
-        android:label="GT.BYBIT"
+        android:label="GT CRYPTO APIs"
         android:supportsRtl="true"
         android:theme="@style/Theme.GTBYBIT"
         android:usesCleartextTraffic="false">

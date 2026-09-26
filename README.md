@@ -7,7 +7,7 @@ Canonical GARHY AI source repository for the GARHY ecosystem.
 - Product: GARHY AI / HANA
 - Vercel project: `garhy-gpt-oss-cloud`
 - Canonical domains: `garhy.ai`, `www.garhy.ai`
-- GT BYBIT is being separated to its own standalone Vercel project and canonical domain `bybit.garhy.tech`.
+- GT CRYPTO APIs has its own standalone Vercel project and canonical domain `crypto.garhy.tech`.
 
 ## Deployment
 

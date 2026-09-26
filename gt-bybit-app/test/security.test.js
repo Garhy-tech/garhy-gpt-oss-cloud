@@ -6,8 +6,16 @@ import { createHandler } from '../api/bybit.js';
 import { createBybitClient,buildQuery,signHmac } from '../lib/bybit.js';
 import { AppError } from '../lib/errors.js';
 import { createRedisStore } from '../lib/store.js';
+import { verifyOrigin } from '../lib/bybit-control.js';
 const order={action:'place-order',category:'spot',symbol:'btcusdt',side:'Buy',orderType:'Market',qty:'0.001'};
 const money=(data)=>({...data,confirmed:true,requestId:crypto.randomUUID()});
+
+test('new production domain accepts same-origin control while untrusted origins remain denied',()=>{
+  assert.doesNotThrow(()=>verifyOrigin({headers:{origin:'https://crypto.garhy.tech','sec-fetch-site':'same-origin'}},{}));
+  assert.doesNotThrow(()=>verifyOrigin({headers:{origin:'https://bybit.garhy.tech','sec-fetch-site':'same-origin'}},{}));
+  assert.throws(()=>verifyOrigin({headers:{origin:'https://evil.example','sec-fetch-site':'same-origin'}},{}),{code:'ORIGIN_DENIED'});
+  assert.throws(()=>verifyOrigin({headers:{origin:'https://crypto.garhy.tech','sec-fetch-site':'cross-site'}},{}),{code:'ORIGIN_DENIED'});
+});
 
 test('opaque cookie is Secure HttpOnly Strict; credentials never returned',async()=>{
   const s=await setup();assert.equal(s.login.statusCode,200);

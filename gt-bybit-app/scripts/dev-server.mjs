@@ -12,7 +12,7 @@ const env=fixtureEnv();env.BYBIT_ALLOWED_ORIGINS=origin;env.GT_APP_MODE='ui-test
 const calls=[];
 const handler=createHandler({env,store:memoryStore(),request:mockRequest(calls),storageReady:()=>true});
 const config=JSON.parse(await readFile(path.join(root,'vercel.json'),'utf8'));
-const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg'};
+const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.webmanifest':'application/manifest+json','.png':'image/png'};
 const server=http.createServer(async(req,res)=>{
   res.status=(status)=>{res.statusCode=status;return res;};res.json=(body)=>{res.setHeader('Content-Type','application/json');res.end(JSON.stringify(body));};
   const url=new URL(req.url,origin);
@@ -50,4 +50,4 @@ const server=http.createServer(async(req,res)=>{
     const body=await readFile(target);res.setHeader('Content-Type',mime[path.extname(target)] || 'application/octet-stream');res.end(body);
   }catch{res.status(404).end('Not found');}
 });
-server.listen(port,'0.0.0.0',()=>console.log(`GT.BYBIT local QA at ${origin}/__qa/ — mock transport only.`));
+server.listen(port,'0.0.0.0',()=>console.log(`GT CRYPTO APIs local QA at ${origin}/__qa/ — mock transport only.`));

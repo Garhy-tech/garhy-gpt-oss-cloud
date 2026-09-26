@@ -15,6 +15,7 @@ const manifest=JSON.parse(await readFile(new URL('gt-bybit/manifest.webmanifest'
 const html=await readFile(new URL('gt-bybit/index.html',root),'utf8');
 const p2pHtml=await readFile(new URL('gt-bybit/p2p.html',root),'utf8');
 const worker=await readFile(new URL('gt-bybit/sw.js',root),'utf8');
+const allowedImages=['assets/gt-crypto/character.png','assets/gt-crypto/scene-watermark.png'];
 
 assert.match(html,/<html lang="ar" dir="rtl">/);
 assert.match(html,/id="secureApp"[^>]*hidden/);
@@ -28,34 +29,50 @@ for(const page of [html,p2pHtml]) {
   }
 }
 
-for(const icon of manifest.icons) {
-  const bytes=await readFile(new URL(icon.src.slice(1),root));
-  assert.equal(bytes.toString('hex',0,8),'89504e470d0a1a0a');
-  const width=bytes.readUInt32BE(16),height=bytes.readUInt32BE(20);
-  assert.equal(icon.sizes,`${width}x${height}`);
-}
+assert.ok(!('icons' in manifest),'Manifest must not request an image icon');
 
 assert.equal(manifest.start_url,'/');
 assert.equal(manifest.scope,'/');
 assert.equal(manifest.display,'standalone');
 assert.equal(config.rewrites.find((r)=>r.source==='/').destination,'/gt-bybit/index.html');
+assert.match(config.headers.find((rule)=>rule.source==='/(.*)').headers.find((header)=>header.key==='Content-Security-Policy').value,/\bimg-src 'self'/);
 assert.equal(config.outputDirectory,'public');
 
-for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','demo-state.js','gt-logo.png','gt-watermark.webp']) {
+for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','demo-state.js']) {
   assert.ok(worker.includes(dependency),`Service worker must include ${dependency}`);
 }
-assert.doesNotMatch(worker,/icon-(?:180|192|512)|gt-profile|gt-primary|gt-app-mark|garhy-tech-signature/);
+for(const asset of allowedImages)assert.ok(worker.includes(`/${asset}`),`Offline shell missing ${asset}`);
 
-async function collectImages(url,prefix='') {
-  const result=[];
+const imageExtension=/\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)$/i;
+const imageFiles=[];
+async function scan(url,prefix='') {
   for(const entry of await readdir(url,{withFileTypes:true})) {
-    const rel=prefix ? prefix+'/'+entry.name : entry.name;
-    if(entry.isDirectory()) result.push(...await collectImages(new URL(entry.name+'/',url),rel));
-    else if(/\.(?:png|jpe?g|webp|gif|avif|svg)$/i.test(entry.name)) result.push(rel);
+    const relative=prefix ? `${prefix}/${entry.name}` : entry.name;
+    // Build output is checked separately after build; tests may contain negative assertions.
+    if(relative==='public' || relative==='test')continue;
+    if(entry.isDirectory()){await scan(new URL(`${entry.name}/`,url),relative);continue;}
+    if(imageExtension.test(entry.name)){
+      imageFiles.push(relative);
+      assert.ok(allowedImages.includes(relative),`Unexpected image file: ${relative}`);
+      continue;
+    }
+    if(!/\.(?:html|css|m?js|json|webmanifest|txt)$/.test(entry.name) || relative==='scripts/check.mjs')continue;
+    const source=await readFile(new URL(entry.name,url),'utf8');
+    assert.doesNotMatch(source,/<(?:picture|source)\b|data:image|apple-touch-icon|https?:\/\/[^\s'"()<>]+\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/i,`Disallowed image reference: ${relative}`);
+    for(const match of source.matchAll(/\/[^\s'"()<>]+?\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/gi)){
+      assert.ok(allowedImages.includes(match[0].slice(1)),`Unexpected image URL in ${relative}: ${match[0]}`);
+    }
+    if(entry.name.endsWith('.html')){
+      for(const match of source.matchAll(/<img\b[^>]*\bsrc="([^"]+)"[^>]*>/gi))assert.equal(match[1],`/${allowedImages[0]}`,`Unexpected HTML image in ${relative}`);
+    }
+    assert.doesNotMatch(source,/(?:createElement\(['"]img['"]\)|new Image\s*\(|createObjectURL\([^)]*image|<canvas\b|\.getContext\(['"]2d)/i,`Image generator: ${relative}`);
+    if(entry.name.endsWith('.css')){
+      for(const match of source.matchAll(/url\s*\(\s*['"]?([^)'"\s]+)['"]?\s*\)/gi))assert.equal(match[1],`/${allowedImages[1]}`,`Unexpected CSS image in ${relative}`);
+      assert.doesNotMatch(source,/image-set\s*\(|border-image\s*:|content\s*:\s*url\s*\(/i,`Unexpected CSS image mechanism: ${relative}`);
+    }
   }
-  return result;
 }
-const images=(await collectImages(new URL('assets/gt-bybit/',root))).sort();
-assert.deepEqual(images,['brand/gt-logo.png','brand/gt-watermark.webp']);
+await scan(root);
+assert.deepEqual(imageFiles.sort(),allowedImages.sort(),'Only the approved character and watermark images may be tracked');
 
-console.log('Syntax, HTML/CSP, local assets, PWA, receipt shell, and strict image inventory passed.');
+console.log('Syntax, HTML/CSP, local assets, PWA, receipt shell, and exact two-image inventory passed.');

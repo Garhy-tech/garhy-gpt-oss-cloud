@@ -10,7 +10,7 @@ GARHY TECH will validate the report, contain any active exposure, and coordinate
 
 ## Scope
 
-This policy covers the code and deployment configuration in this repository, including GT.BYBIT server-side API routes, session controls, Bybit V5 integration, web assets, and the Android wrapper.
+This policy covers the code and deployment configuration in this repository, including GT CRYPTO APIs server-side API routes, session controls, Bybit V5 integration, web assets, and the Android wrapper.
 
 ## Safe testing
 

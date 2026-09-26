@@ -19,7 +19,7 @@
     dialog.setAttribute('aria-labelledby','receiptTitle');
     dialog.innerHTML=`
       <div class="receipt-head">
-        <div><span>GT.BYBIT · GARHY TECH</span><h2 id="receiptTitle">إيصال العملية</h2></div>
+        <div><span>GT CRYPTO APIs · GARHY TECH</span><h2 id="receiptTitle">إيصال العملية</h2></div>
         <button id="receiptClose" class="receipt-close" type="button" aria-label="إغلاق">×</button>
       </div>
       <div class="receipt-status"><strong id="receiptStatus">—</strong><span id="receiptTime">—</span></div>
