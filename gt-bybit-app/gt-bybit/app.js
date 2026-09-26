@@ -64,7 +64,7 @@ function updateNotificationState(){
 async function notify(title,body,tag){
   if(!notificationsEnabled())return;
   const registration=await navigator.serviceWorker?.ready.catch(()=>null);
-  if(registration)await registration.showNotification(title,{body,tag,icon:'/assets/gt-bybit/brand/gt-logo.png',badge:'/assets/gt-bybit/brand/gt-logo.png',dir:window.GTPreferences?.dir?.() || 'rtl',lang:window.GTPreferences?.language?.() || 'ar',renotify:false,data:{url:'/'}});
+  if(registration)await registration.showNotification(title,{body,tag,dir:window.GTPreferences?.dir?.() || 'rtl',lang:window.GTPreferences?.language?.() || 'ar',renotify:false,data:{url:'/'}});
 }
 async function toggleNotifications(){
   if(notificationsEnabled()){

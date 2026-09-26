@@ -17,7 +17,7 @@
     'GT.BYBIT · إدارة حساب Bybit':'GT.BYBIT · Bybit Account Control','جارٍ الفحص':'Checking','تثبيت التطبيق':'Install App',
     'تحديث البيانات':'Refresh data','تسجيل الخروج':'Sign out','إدارة التداول والأصول':'Trading & Asset Control',
     'حسابك وأوامرك وأصولك في لوحة واحدة، مع مراجعة واضحة قبل تنفيذ أي عملية.':'Your account, orders, and assets in one control surface, with a clear review before every operation.',
-    'الحالة:':'Status:','فحص الاتصال...':'Checking connection...','أيقونة GT.BYBIT':'GT.BYBIT icon',
+    'الحالة:':'Status:','فحص الاتصال...':'Checking connection...',
     'فتح جلسة التحكم':'Open Control Session','أدخل رمز التحكم الخاص بك للوصول إلى حسابك بأمان.':'Enter your control token to access your account securely.',
     'رمز التحكم':'Control token','فتح الجلسة':'Open Session',
     'تبقى الجلسة مفتوحة عند تحديث الصفحة، ولا تُغلق بسبب الخمول. يمكنك إنهاؤها من زر تسجيل الخروج.':'The session persists across refreshes and does not close due to inactivity. You can end it using Sign out.',

@@ -219,7 +219,6 @@ function handlePendingNotifications(list) {
   if (!newIds.length || !('Notification' in window) || Notification.permission !== 'granted') return;
   new Notification('GT.BYBIT · طلب P2P جديد', {
     body: `${newIds.length} طلب Pending جديد يحتاج متابعة.`,
-    icon: '/assets/gt-bybit/brand/gt-logo.png',
     tag: 'gt-bybit-p2p-pending',
   });
 }

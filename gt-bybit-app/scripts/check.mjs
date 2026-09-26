@@ -28,12 +28,7 @@ for(const page of [html,p2pHtml]) {
   }
 }
 
-for(const icon of manifest.icons) {
-  const bytes=await readFile(new URL(icon.src.slice(1),root));
-  assert.equal(bytes.toString('hex',0,8),'89504e470d0a1a0a');
-  const width=bytes.readUInt32BE(16),height=bytes.readUInt32BE(20);
-  assert.equal(icon.sizes,`${width}x${height}`);
-}
+assert.ok(!('icons' in manifest),'Manifest must not request an image icon');
 
 assert.equal(manifest.start_url,'/');
 assert.equal(manifest.scope,'/');
@@ -41,21 +36,26 @@ assert.equal(manifest.display,'standalone');
 assert.equal(config.rewrites.find((r)=>r.source==='/').destination,'/gt-bybit/index.html');
 assert.equal(config.outputDirectory,'public');
 
-for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','demo-state.js','gt-logo.png','gt-watermark.webp']) {
+for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','demo-state.js']) {
   assert.ok(worker.includes(dependency),`Service worker must include ${dependency}`);
 }
-assert.doesNotMatch(worker,/icon-(?:180|192|512)|gt-profile|gt-primary|gt-app-mark|garhy-tech-signature/);
+assert.doesNotMatch(worker,/\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/i);
 
-async function collectImages(url,prefix='') {
-  const result=[];
+const imageExtension=/\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)$/i;
+async function scan(url,prefix='') {
   for(const entry of await readdir(url,{withFileTypes:true})) {
-    const rel=prefix ? prefix+'/'+entry.name : entry.name;
-    if(entry.isDirectory()) result.push(...await collectImages(new URL(entry.name+'/',url),rel));
-    else if(/\.(?:png|jpe?g|webp|gif|avif|svg)$/i.test(entry.name)) result.push(rel);
+    const relative=prefix ? `${prefix}/${entry.name}` : entry.name;
+    // Build output is checked separately after build; tests may contain negative assertions.
+    if(relative==='public' || relative==='test')continue;
+    if(entry.isDirectory()){await scan(new URL(`${entry.name}/`,url),relative);continue;}
+    assert.ok(!imageExtension.test(entry.name),`Image file in GT.BYBIT: ${relative}`);
+    if(!/\.(?:html|css|m?js|json|webmanifest|txt)$/.test(entry.name) || relative==='scripts/check.mjs')continue;
+    const source=await readFile(new URL(entry.name,url),'utf8');
+    assert.doesNotMatch(source,/<(?:img|picture|source)\b|data:image|apple-touch-icon|(?:image\/(?:png|jpeg|webp|svg\+xml))|(?:\.)(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/i,`Image reference: ${relative}`);
+    assert.doesNotMatch(source,/(?:createElement\(['"]img['"]\)|new Image\s*\(|createObjectURL\([^)]*image|<canvas\b|\.getContext\(['"]2d)/i,`Image generator: ${relative}`);
+    if(entry.name.endsWith('.css'))assert.doesNotMatch(source,/(?:url\s*\(|image-set\s*\(|border-image\s*:|content\s*:\s*url\s*\()/i,`CSS image URL: ${relative}`);
   }
-  return result;
 }
-const images=(await collectImages(new URL('assets/gt-bybit/',root))).sort();
-assert.deepEqual(images,['brand/gt-logo.png','brand/gt-watermark.webp']);
+await scan(root);
 
-console.log('Syntax, HTML/CSP, local assets, PWA, receipt shell, and strict image inventory passed.');
+console.log('Syntax, HTML/CSP, local assets, PWA, receipt shell, and zero-image inventory passed.');

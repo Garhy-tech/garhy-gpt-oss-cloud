@@ -19,14 +19,6 @@
     "business",
     "utilities"
   ],
-  "icons": [
-    {
-      "src": "/assets/gt-bybit/brand/gt-logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
   "shortcuts": [
     {
       "name": "التداول",
