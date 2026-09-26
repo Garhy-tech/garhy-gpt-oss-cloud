@@ -9,7 +9,7 @@ export function memoryStore(now=Date.now) {
     async increment(key,ttl){const old=await this.get(key);const n=(old || 0)+1;await this.set(key,n,ttl);return n;},
   };
 }
-export function fixtureEnv() {return {BYBIT_CONTROL_TOKEN:crypto.randomBytes(32).toString('hex'),BYBIT_API_KEY:crypto.randomBytes(16).toString('hex'),BYBIT_API_SECRET:crypto.randomBytes(32).toString('hex'),BYBIT_ENABLE_MUTATIONS:'true',BYBIT_ALLOWED_ORIGINS:'https://bybit.garhy.tech'};}
+export function fixtureEnv() {return {BYBIT_CONTROL_TOKEN:crypto.randomBytes(32).toString('hex'),BYBIT_API_KEY:crypto.randomBytes(16).toString('hex'),BYBIT_API_SECRET:crypto.randomBytes(32).toString('hex'),BYBIT_ENABLE_MUTATIONS:'true',BYBIT_ALLOWED_ORIGINS:'https://crypto.garhy.tech'};}
 export function mockRequest(calls=[],now=Date.now) {
   return async(method,path,payload)=>{
     calls.push({method,path,payload});
@@ -28,7 +28,7 @@ export function mockRequest(calls=[],now=Date.now) {
   };
 }
 export async function invoke(handler,{method='GET',query={},body,headers={},cookie,csrf}={}) {
-  const req={method,query,body,headers:{...(body!==undefined?{'content-type':'application/json',origin:'https://bybit.garhy.tech'}:{}),...(cookie?{cookie}:{}),...(csrf?{'x-csrf-token':csrf}:{}),...headers},socket:{remoteAddress:'test'}};
+  const req={method,query,body,headers:{...(body!==undefined?{'content-type':'application/json',origin:'https://crypto.garhy.tech'}:{}),...(cookie?{cookie}:{}),...(csrf?{'x-csrf-token':csrf}:{}),...headers},socket:{remoteAddress:'test'}};
   const res={headers:{},setHeader(key,value){this.headers[key.toLowerCase()]=value;},status(status){this.statusCode=status;return this;},json(body){this.body=body;return this;}};
   await handler(req,res);return res;
 }

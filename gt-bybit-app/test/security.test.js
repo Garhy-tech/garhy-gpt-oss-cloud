@@ -12,7 +12,7 @@ const money=(data)=>({...data,confirmed:true,requestId:crypto.randomUUID()});
 
 test('new production domain accepts same-origin control while untrusted origins remain denied',()=>{
   assert.doesNotThrow(()=>verifyOrigin({headers:{origin:'https://crypto.garhy.tech','sec-fetch-site':'same-origin'}},{}));
-  assert.doesNotThrow(()=>verifyOrigin({headers:{origin:'https://bybit.garhy.tech','sec-fetch-site':'same-origin'}},{}));
+  assert.throws(()=>verifyOrigin({headers:{origin:'https://retired.garhy.tech','sec-fetch-site':'same-origin'}},{}),{code:'ORIGIN_DENIED'});
   assert.throws(()=>verifyOrigin({headers:{origin:'https://evil.example','sec-fetch-site':'same-origin'}},{}),{code:'ORIGIN_DENIED'});
   assert.throws(()=>verifyOrigin({headers:{origin:'https://crypto.garhy.tech','sec-fetch-site':'cross-site'}},{}),{code:'ORIGIN_DENIED'});
 });
