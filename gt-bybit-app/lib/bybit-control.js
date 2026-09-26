@@ -18,7 +18,7 @@ export function sessionLifetime(env = process.env) {
 
 export function verifyOrigin(req, env = process.env) {
   const origin = req.headers.origin;
-  const allowed = (env.BYBIT_ALLOWED_ORIGINS || 'https://crypto.garhy.tech,https://bybit.garhy.tech').split(',').map((s) => s.trim());
+  const allowed = (env.BYBIT_ALLOWED_ORIGINS || 'https://crypto.garhy.tech').split(',').map((s) => s.trim());
   assert(typeof origin === 'string' && allowed.includes(origin), 'ORIGIN_DENIED', 'مصدر الطلب غير مصرح به.', 403);
   assert(!req.headers['sec-fetch-site'] || req.headers['sec-fetch-site'] === 'same-origin', 'ORIGIN_DENIED', 'مصدر الطلب غير مصرح به.', 403);
 }
