@@ -217,7 +217,7 @@ function handlePendingNotifications(list) {
   const newIds = [...ids].filter((id) => !knownPendingIds.has(id));
   knownPendingIds = ids;
   if (!newIds.length || !('Notification' in window) || Notification.permission !== 'granted') return;
-  new Notification('GT.BYBIT · طلب P2P جديد', {
+  new Notification('GT CRYPTO APIs · طلب P2P جديد', {
     body: `${newIds.length} طلب Pending جديد يحتاج متابعة.`,
     tag: 'gt-bybit-p2p-pending',
   });

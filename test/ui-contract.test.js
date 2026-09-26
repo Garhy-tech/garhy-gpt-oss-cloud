@@ -8,8 +8,8 @@ const gtBybitIndex = readFileSync(new URL('../gt-bybit-app/gt-bybit/index.html',
 const gtBybitApp = readFileSync(new URL('../gt-bybit-app/gt-bybit/app.js', import.meta.url), 'utf8');
 const hanaIndex = readFileSync(new URL('../hana-ai-pro/index.html', import.meta.url), 'utf8');
 
-test('repository root and GT.BYBIT route forward to the canonical app without legacy files', () => {
-  assert.match(rootIndex, /<title>GT\.BYBIT<\/title>/);
+test('repository root and GT CRYPTO APIs route forward to the canonical app without legacy files', () => {
+  assert.match(rootIndex, /<title>GT CRYPTO APIs<\/title>/);
   assert.match(rootIndex, /noindex,nofollow,noarchive/);
   assert.match(rootIndex, /location\.replace\('\/gt-bybit\/'\)/);
 
@@ -20,8 +20,9 @@ test('repository root and GT.BYBIT route forward to the canonical app without le
   assert.ok(!routing.rewrites.some((rule) => rule.source.startsWith('/assets/gt-bybit/')));
 });
 
-test('the canonical GT.BYBIT interface preserves secure control and confirmation surfaces', () => {
-  assert.match(gtBybitIndex, /<title>GT\.BYBIT<\/title>/);
+test('the canonical GT CRYPTO APIs interface preserves secure control and confirmation surfaces', () => {
+  assert.match(gtBybitIndex, /<title>GT CRYPTO APIs<\/title>/);
+  assert.match(gtBybitIndex, /<h1>GT CRYPTO APIs<\/h1>/);
   assert.match(gtBybitIndex, /GARHY TECH/);
   assert.match(gtBybitIndex, /id="authGate"/);
   assert.match(gtBybitIndex, /id="controlToken"/);
@@ -34,7 +35,7 @@ test('the canonical GT.BYBIT interface preserves secure control and confirmation
   assert.match(gtBybitApp, /credentials:\s*['"]same-origin['"]/);
 });
 
-test('the canonical GT.BYBIT interface remains private from search indexing', () => {
+test('the canonical GT CRYPTO APIs interface remains private from search indexing', () => {
   assert.match(gtBybitIndex, /noindex,nofollow,noarchive/);
   assert.match(gtBybitIndex, /rel="manifest"/);
   assert.match(gtBybitIndex, /dir="rtl"/);

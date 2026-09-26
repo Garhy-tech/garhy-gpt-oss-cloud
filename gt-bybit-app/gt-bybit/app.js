@@ -69,13 +69,13 @@ async function notify(title,body,tag){
 async function toggleNotifications(){
   if(notificationsEnabled()){
     persistNotificationPreference(NOTIFICATION_OFF);updateNotificationState();
-    return toast('تم إيقاف إشعارات GT.BYBIT يدويًا.');
+    return toast('تم إيقاف إشعارات GT CRYPTO APIs يدويًا.');
   }
   if(!('Notification' in window))return toast('الإشعارات غير مدعومة على هذا المتصفح.','error');
   const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();
   if(permission==='granted'){
     if(!persistNotificationPreference(NOTIFICATION_ON))return toast('تعذر حفظ اختيار الإشعارات على هذا الجهاز.','error');
-    updateNotificationState();await notify('GT.BYBIT','الإشعارات مفعّلة باستمرار ولن تتوقف إلا عند إيقافها يدويًا.','gt-bybit-enabled');
+    updateNotificationState();await notify('GT CRYPTO APIs','الإشعارات مفعّلة باستمرار ولن تتوقف إلا عند إيقافها يدويًا.','gt-bybit-enabled');
   }
   else{updateNotificationState();toast('فعّل الإشعارات من إعدادات الموقع في الهاتف.','error');}
 }
@@ -126,7 +126,7 @@ function lockLocal() {
   if($('confirmDialog').open) $('confirmDialog').close('cancel');
   for(const id of ['walletTable','positionsTable','ordersTable','availableAssets']) $(id).textContent='افتح الجلسة لعرض البيانات.';
   for(const id of ['mEquity','mWallet','mPositions','mOrders','identityUid','identityKyc','identityRegion','identityMaster','identityParent','identityVip','identityUnified','identityReadOnly']) $(id).textContent='—';
-  $$('form').forEach((form)=>form.reset());setUnlocked(false);setStatus('idle','مقفلة');$('pageTitle').textContent='GT.BYBIT';
+  $$('form').forEach((form)=>form.reset());setUnlocked(false);setStatus('idle','مقفلة');$('pageTitle').textContent='GT CRYPTO APIs';
 }
 function navigate(view) {
   const target=VIEW_TITLES[view]?view:'overview';
@@ -151,7 +151,7 @@ async function connect() {
   const input=$('controlToken');
   if(!input.value.trim())return toast('أدخل رمز التحكم أولًا.','error');
   state.pending.add('connect');$('connectBtn').disabled=true;$('connectBtn').textContent='جارٍ التحقق…';
-  try { const body={controlToken:input.value.trim()};input.value='';const session=await api('login',{body,allowLocked:true});body.controlToken='';await applySession(session);sessionChannel?.postMessage('changed');toast('تم فتح جلسة التحكم.','success');await notify('تنبيه أمان GT.BYBIT','تم فتح جلسة تحكم جديدة.','gt-bybit-login'); }
+  try { const body={controlToken:input.value.trim()};input.value='';const session=await api('login',{body,allowLocked:true});body.controlToken='';await applySession(session);sessionChannel?.postMessage('changed');toast('تم فتح جلسة التحكم.','success');await notify('تنبيه أمان GT CRYPTO APIs','تم فتح جلسة تحكم جديدة.','gt-bybit-login'); }
   catch(error) {toast(error.message,'error');}
   finally {input.value='';state.pending.delete('connect');$('connectBtn').disabled=false;$('connectBtn').textContent='فتح الجلسة';}
 }
@@ -204,7 +204,7 @@ async function runMutation(control,input,after=()=>{}) {
     state.attempts.delete(fingerprint);
     window.GTReceipts?.present(response.receipt);
     if(data.action==='convert-confirm')clearQuote();
-    toast('استلمت Bybit الطلب وتم إنشاء إيصال PDF. تحقّق من حالته النهائية في سجل الحساب.','success');await notify('GT.BYBIT','استلمت Bybit طلب العملية بعد تأكيدك. راجع سجل الحساب للحالة النهائية.',`gt-bybit-${data.action}`);
+    toast('استلمت Bybit الطلب وتم إنشاء إيصال PDF. تحقّق من حالته النهائية في سجل الحساب.','success');await notify('GT CRYPTO APIs','استلمت Bybit طلب العملية بعد تأكيدك. راجع سجل الحساب للحالة النهائية.',`gt-bybit-${data.action}`);
     try {await after();} catch {toast('قُبل الطلب، لكن تعذر تحديث البيانات. حدّثها يدويًا.');}
   } catch(error){toast(error.message,'error');}
   finally{state.pending.delete('mutation');control.removeAttribute('aria-busy');updateConnectivity();}
@@ -294,7 +294,7 @@ async function refreshDashboard(showToast=true) {
     if(epoch!==state.generation || !state.authenticated)return;
     const rejected=results.filter((r)=>r.status==='rejected');
     if(rejected.length) {setStatus('error','بيانات غير مكتملة');toast(rejected[0].reason.message,'error');}
-    else {const next={equity:$('mEquity').textContent,positions:$('mPositions').textContent,orders:$('mOrders').textContent};if(state.accountSnapshot && JSON.stringify(next)!==JSON.stringify(state.accountSnapshot))await notify('تحديث حساب GT.BYBIT','تم رصد تغيير في ملخص الحساب أو المراكز أو الأوامر. افتح التطبيق للمراجعة.','gt-bybit-account-change');state.accountSnapshot=next;setStatus('ok','متصل بـBybit');if(showToast)toast('تم تحديث بيانات الحساب.','success');}
+    else {const next={equity:$('mEquity').textContent,positions:$('mPositions').textContent,orders:$('mOrders').textContent};if(state.accountSnapshot && JSON.stringify(next)!==JSON.stringify(state.accountSnapshot))await notify('تحديث حساب GT CRYPTO APIs','تم رصد تغيير في ملخص الحساب أو المراكز أو الأوامر. افتح التطبيق للمراجعة.','gt-bybit-account-change');state.accountSnapshot=next;setStatus('ok','متصل بـBybit');if(showToast)toast('تم تحديث بيانات الحساب.','success');}
   } finally {state.refreshing=false;updateConnectivity();}
 }
 $('connectBtn').addEventListener('click',connect);

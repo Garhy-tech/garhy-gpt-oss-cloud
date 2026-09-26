@@ -61,7 +61,7 @@ function flatten(value,prefix,lines) {
 }
 function pdfFor(receipt) {
   const source=[
-    'GT.BYBIT - GARHY TECH','TRANSACTION RECEIPT','',
+    'GT CRYPTO APIs - GARHY TECH','TRANSACTION RECEIPT','',
     `Receipt ID: ${receipt.receiptId}`,
     `Timestamp: ${receipt.timestamp}`,
     `Channel: ${receipt.channel}`,
@@ -79,7 +79,7 @@ function pdfFor(receipt) {
   const lines=source.flatMap((line)=>wrap(line,88));
   const pages=[];
   for(let i=0;i<lines.length;i+=48) pages.push(lines.slice(i,i+48));
-  if(!pages.length) pages.push(['GT.BYBIT TRANSACTION RECEIPT']);
+  if(!pages.length) pages.push(['GT CRYPTO APIs TRANSACTION RECEIPT']);
 
   const pageIds=pages.map((_,i)=>4+i*2);
   const contentIds=pages.map((_,i)=>5+i*2);

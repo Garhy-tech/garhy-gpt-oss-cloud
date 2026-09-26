@@ -1,6 +1,6 @@
-# GT.BYBIT Android
+# GT CRYPTO APIs Android
 
-Native Android shell for the GARHY TECH GT.BYBIT control application.
+Native Android shell for the GARHY TECH GT CRYPTO APIs control application.
 
 - Package: `tech.garhy.gtbybit`
 - Production URL: `https://garhy-gpt-oss-cloud.vercel.app/gt-bybit/`

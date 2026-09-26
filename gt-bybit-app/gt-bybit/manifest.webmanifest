@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "GT.BYBIT",
-  "short_name": "GT.BYBIT",
-  "description": "GT.BYBIT — إدارة الحساب والتداول والأصول",
+  "name": "GT CRYPTO APIs",
+  "short_name": "GT CRYPTO APIs",
+  "description": "GT CRYPTO APIs — إدارة الحساب والتداول والأصول",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

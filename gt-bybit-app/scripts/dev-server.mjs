@@ -50,4 +50,4 @@ const server=http.createServer(async(req,res)=>{
     const body=await readFile(target);res.setHeader('Content-Type',mime[path.extname(target)] || 'application/octet-stream');res.end(body);
   }catch{res.status(404).end('Not found');}
 });
-server.listen(port,'0.0.0.0',()=>console.log(`GT.BYBIT local QA at ${origin}/__qa/ — mock transport only.`));
+server.listen(port,'0.0.0.0',()=>console.log(`GT CRYPTO APIs local QA at ${origin}/__qa/ — mock transport only.`));

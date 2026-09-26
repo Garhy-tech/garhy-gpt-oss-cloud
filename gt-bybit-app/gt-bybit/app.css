@@ -108,7 +108,7 @@ body[data-locked="true"]{padding-bottom:0}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 
-/* GT.BYBIT adaptive theme + language controls */
+/* GT CRYPTO APIs adaptive theme + language controls */
 .preference-switches{display:flex;align-items:center;gap:7px;direction:ltr;flex:0 0 auto}
 .preference-toggle{height:42px;min-height:42px;min-width:74px;padding:0 11px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:13px;background:rgba(7,25,54,.8);color:#c7d8ee;font-weight:800;font-size:11px;line-height:1;cursor:pointer;white-space:nowrap;transition:border-color .18s ease,background-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease}
 .preference-toggle:hover{border-color:var(--line-strong);background:rgba(15,48,94,.84);transform:translateY(-1px)}

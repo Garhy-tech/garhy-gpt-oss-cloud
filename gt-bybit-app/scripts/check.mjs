@@ -48,7 +48,7 @@ async function scan(url,prefix='') {
     // Build output is checked separately after build; tests may contain negative assertions.
     if(relative==='public' || relative==='test')continue;
     if(entry.isDirectory()){await scan(new URL(`${entry.name}/`,url),relative);continue;}
-    assert.ok(!imageExtension.test(entry.name),`Image file in GT.BYBIT: ${relative}`);
+    assert.ok(!imageExtension.test(entry.name),`Image file in GT CRYPTO APIs: ${relative}`);
     if(!/\.(?:html|css|m?js|json|webmanifest|txt)$/.test(entry.name) || relative==='scripts/check.mjs')continue;
     const source=await readFile(new URL(entry.name,url),'utf8');
     assert.doesNotMatch(source,/<(?:img|picture|source)\b|data:image|apple-touch-icon|(?:image\/(?:png|jpeg|webp|svg\+xml))|(?:\.)(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/i,`Image reference: ${relative}`);
