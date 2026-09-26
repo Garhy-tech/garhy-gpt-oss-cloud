@@ -15,6 +15,7 @@ const manifest=JSON.parse(await readFile(new URL('gt-bybit/manifest.webmanifest'
 const html=await readFile(new URL('gt-bybit/index.html',root),'utf8');
 const p2pHtml=await readFile(new URL('gt-bybit/p2p.html',root),'utf8');
 const worker=await readFile(new URL('gt-bybit/sw.js',root),'utf8');
+const allowedImages=['assets/gt-crypto/character.png','assets/gt-crypto/scene-watermark.png'];
 
 assert.match(html,/<html lang="ar" dir="rtl">/);
 assert.match(html,/id="secureApp"[^>]*hidden/);
@@ -39,23 +40,38 @@ assert.equal(config.outputDirectory,'public');
 for(const dependency of ['preferences-bootstrap.js','preferences.js','receipts.js','p2p-console.js','demo-state.js']) {
   assert.ok(worker.includes(dependency),`Service worker must include ${dependency}`);
 }
-assert.doesNotMatch(worker,/\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/i);
+for(const asset of allowedImages)assert.ok(worker.includes(`/${asset}`),`Offline shell missing ${asset}`);
 
 const imageExtension=/\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)$/i;
+const imageFiles=[];
 async function scan(url,prefix='') {
   for(const entry of await readdir(url,{withFileTypes:true})) {
     const relative=prefix ? `${prefix}/${entry.name}` : entry.name;
     // Build output is checked separately after build; tests may contain negative assertions.
     if(relative==='public' || relative==='test')continue;
     if(entry.isDirectory()){await scan(new URL(`${entry.name}/`,url),relative);continue;}
-    assert.ok(!imageExtension.test(entry.name),`Image file in GT CRYPTO APIs: ${relative}`);
+    if(imageExtension.test(entry.name)){
+      imageFiles.push(relative);
+      assert.ok(allowedImages.includes(relative),`Unexpected image file: ${relative}`);
+      continue;
+    }
     if(!/\.(?:html|css|m?js|json|webmanifest|txt)$/.test(entry.name) || relative==='scripts/check.mjs')continue;
     const source=await readFile(new URL(entry.name,url),'utf8');
-    assert.doesNotMatch(source,/<(?:img|picture|source)\b|data:image|apple-touch-icon|(?:image\/(?:png|jpeg|webp|svg\+xml))|(?:\.)(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/i,`Image reference: ${relative}`);
+    assert.doesNotMatch(source,/<(?:picture|source)\b|data:image|apple-touch-icon|https?:\/\/[^\s'"()<>]+\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/i,`Disallowed image reference: ${relative}`);
+    for(const match of source.matchAll(/\/[^\s'"()<>]+?\.(?:png|jpe?g|webp|gif|avif|bmp|ico|svg|tiff?)(?:\b|\?)/gi)){
+      assert.ok(allowedImages.includes(match[0].slice(1)),`Unexpected image URL in ${relative}: ${match[0]}`);
+    }
+    if(entry.name.endsWith('.html')){
+      for(const match of source.matchAll(/<img\b[^>]*\bsrc="([^"]+)"[^>]*>/gi))assert.equal(match[1],`/${allowedImages[0]}`,`Unexpected HTML image in ${relative}`);
+    }
     assert.doesNotMatch(source,/(?:createElement\(['"]img['"]\)|new Image\s*\(|createObjectURL\([^)]*image|<canvas\b|\.getContext\(['"]2d)/i,`Image generator: ${relative}`);
-    if(entry.name.endsWith('.css'))assert.doesNotMatch(source,/(?:url\s*\(|image-set\s*\(|border-image\s*:|content\s*:\s*url\s*\()/i,`CSS image URL: ${relative}`);
+    if(entry.name.endsWith('.css')){
+      for(const match of source.matchAll(/url\s*\(\s*['"]?([^)'"\s]+)['"]?\s*\)/gi))assert.equal(match[1],`/${allowedImages[1]}`,`Unexpected CSS image in ${relative}`);
+      assert.doesNotMatch(source,/image-set\s*\(|border-image\s*:|content\s*:\s*url\s*\(/i,`Unexpected CSS image mechanism: ${relative}`);
+    }
   }
 }
 await scan(root);
+assert.deepEqual(imageFiles.sort(),allowedImages.sort(),'Only the approved character and watermark images may be tracked');
 
-console.log('Syntax, HTML/CSP, local assets, PWA, receipt shell, and zero-image inventory passed.');
+console.log('Syntax, HTML/CSP, local assets, PWA, receipt shell, and exact two-image inventory passed.');

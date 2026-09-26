@@ -1,5 +1,5 @@
-const CACHE='gt-bybit-shell-20260926-crypto-apis1';
-const VERSION='20260926-crypto-apis1';
+const CACHE='gt-bybit-shell-20260926-branded1';
+const VERSION='20260926-branded1';
 const STATIC=[
   '/gt-bybit/index.html',
   '/gt-bybit/p2p.html',
@@ -14,6 +14,8 @@ const STATIC=[
   `/gt-bybit/p2p-console.js?v=${VERSION}`,
   `/gt-bybit/validation.js?v=${VERSION}`,
   '/gt-bybit/manifest.webmanifest',
+  '/assets/gt-crypto/character.png',
+  '/assets/gt-crypto/scene-watermark.png',
 ];
 const ALLOWED=new Set(STATIC.map((path)=>new URL(path,self.location.origin).pathname));
 
