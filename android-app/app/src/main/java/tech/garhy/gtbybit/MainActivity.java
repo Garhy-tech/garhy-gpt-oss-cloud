@@ -17,8 +17,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
-    private static final String PRIMARY_URL = "https://bybit.garhy.tech/?native=android";
-    private static final String PRIMARY_HOST = "bybit.garhy.tech";
+    private static final String PRIMARY_URL = "https://crypto.garhy.tech/?native=android";
+    private static final String PRIMARY_HOST = "crypto.garhy.tech";
     private static final String FALLBACK_URL = "https://garhy-gpt-oss-cloud.vercel.app/gt-bybit/?native=android";
     private static final String FALLBACK_HOST = "garhy-gpt-oss-cloud.vercel.app";
 
